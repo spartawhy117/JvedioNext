@@ -134,6 +134,23 @@ DEF-002.mkv
 海报卡 + 标题 + 演员 + 详情页入口
 ```
 
+**目录与缓存位置**
+
+- 标准库扫描时，会尽量把平铺影片整理进独立影片目录；已经是稳定影片目录的内容则继续沿用原目录。
+- 抓取后的 `NFO` 与三张主图直接写回影片所在目录，典型结构如下：
+
+```text
+aaa (目录)/
+  ABC-001 (目录)/
+    ABC-001.mp4
+    ABC-001.nfo
+    ABC-001-poster.jpg
+    ABC-001-thumb.jpg
+    ABC-001-fanart.jpg
+```
+
+- 演员头像不写回影片目录，而是统一缓存到 `data/<user>/cache/actor-avatar/`，用于演员页、详情页和后续导入导出复用。
+
 **四个按钮分别做什么**
 
 - `扫描`：按已配置的 1 到 3 条扫描目录重新识别影片，处理新增与失效记录。
@@ -227,6 +244,20 @@ aaa (目录)/
 进入 c1 后显示:
 影片 = [p1.mp4]
 ```
+
+**目录与缓存位置**
+
+- 非标准本地库不会改造原影片目录；原始 `mp4 / mkv` 仍留在你自己的扫描目录中。
+- 生成动态封面后，单影片的静态封面和悬停预览统一写入 `data/<user>/cache/video-preview/<libraryId>/<videoId>/`：
+
+```text
+data/<user>/cache/video-preview/<libraryId>/<videoId>/
+  poster.jpg
+  preview.mp4
+```
+
+- 如果首页或合集页需要显示合集卡封面，自动拼接后的合集封面写入 `data/<user>/cache/video-preview/<libraryId>/collections/<collectionKey>/cover.jpg`。
+- 这些缓存属于软件内部资产，删除库时会一并清理映射缓存，但不会删除原始影片目录。
 
 **四个按钮分别做什么**
 
