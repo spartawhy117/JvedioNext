@@ -26,7 +26,7 @@ JvedioNext 的目标不是把影片简单列出来，而是把“标准片库”
 
 ## 预览
 
-| 影片库 | 本地库 |
+| 暗色 | 浅色 |
 | --- | --- |
 | ![影片库暗色预览](./.github/assets/readme-preview-dark.png) | ![影片库亮色预览](./.github/assets/readme-preview-light.png) |
 
