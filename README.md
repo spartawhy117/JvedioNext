@@ -70,8 +70,18 @@ Worker process exited unexpectedly
 应用启动后，如果你要使用标准库的元数据抓取功能，还需要准备 `MetaTube` 服务地址：
 
 - `JvedioNext` 不内置公共 `MetaTube` 后端
-- 你需要自己搭建 `MetaTube` 后端，或自行寻找可用的公共接口服务
 - 准备好后，把服务地址填到软件设置页中的 `MetaTube 服务地址`
+- 自己搭建：
+  可以先看 MetaTube 官方文档和官方项目主页，再按文档部署后端服务
+  [MetaTube 官方文档](https://metatube-community.github.io/)
+  [MetaTube 官方 GitHub](https://github.com/metatube-community)
+- 寻找公共接口：
+  如果你不想自己搭建，可以自行搜索可用的公共接口服务，建议搜索这些关键词：
+  `MetaTube 部署`
+  `MetaTube Docker`
+  `MetaTube 服务地址`
+  `Jvedio MetaTube 配置`
+  `MetaTube 公共节点`
 
 ### 🧩 可选
 
