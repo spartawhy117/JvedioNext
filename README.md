@@ -47,9 +47,14 @@ JvedioNext 的目标不是把影片简单列出来，而是把“标准片库”
 
 ---
 
-## 首次启动前请先安装 .NET 8 运行时
+## 首次启动前请先安装启动依赖
 
-当前便携包内的 `Jvedio.Worker.exe` 是 **framework-dependent** 发布方式，首次在新机器上运行前，需要系统里已经安装 `.NET 8` 运行时。
+当前便携包首次在新机器上运行前，系统里需要至少具备下面 2 项启动依赖：
+
+- `.NET 8 ASP.NET Core Runtime (Windows x64)`：
+  `Jvedio.Worker.exe` 目前是 **framework-dependent** 发布方式，缺少 `.NET 8` 时 Worker 无法拉起。
+- `Microsoft Edge WebView2 Runtime`：
+  `JvedioNext.exe` 的界面壳基于 Tauri 2，Windows 下依赖 WebView2 渲染前端页面。
 
 如果启动时看到下面这类提示，通常就是本机缺少对应运行时，导致 Worker 无法拉起：
 
@@ -64,14 +69,16 @@ Worker process exited unexpectedly
 
 - `ASP.NET Core Runtime 8.0 (Windows x64)`：
   [官方 .NET 8 下载页](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0)
-- 如果你是开发者，或者本机本来就需要编译本项目，也可以直接安装：
-  在同一页面选择 `SDK 8.0` 安装包即可：
+- `Microsoft Edge WebView2 Runtime`：
+  [微软官方 WebView2 下载页](https://developer.microsoft.com/en-us/microsoft-edge/webview2)
+- 如果你是开发者，或者本机本来就需要编译本项目，也可以直接安装 `SDK 8.0`：
   [官方 .NET 8 下载页](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0)
 
 **安装后怎么确认**
 
 - 打开 PowerShell，执行 `dotnet --list-runtimes`
 - 输出里至少应包含一行 `Microsoft.AspNetCore.App 8.x.x`
+- `WebView2 Runtime` 一般在 Windows 11 已内置，很多 Windows 10 机器也已预装；如果启动后仍是白屏、窗口打不开或界面无法渲染，再优先补装上面的官方 WebView2 Runtime
 - 安装完成后重新启动 `JvedioNext.exe`
 
 补充说明：
