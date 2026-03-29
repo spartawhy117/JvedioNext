@@ -75,6 +75,12 @@ Worker process exited unexpectedly
 
 - 缺少 `WebView2 Runtime` 时，前端窗口可能无法正常打开，或出现白屏、界面无法渲染。
 
+**安装后怎么快速验证**
+
+- 打开 PowerShell，执行 `dotnet --list-runtimes`，确认包含 `Microsoft.AspNetCore.App 8.0.x`
+- 进入解压目录后执行 `.\worker\Jvedio.Worker.exe`
+- 如果看到 `Now listening on: http://127.0.0.1:xxxx`，说明 Worker 已可正常启动；如果这里直接报错，把报错原文反馈出来即可
+
 ---
 
 ## 设置页概览
