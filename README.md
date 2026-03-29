@@ -76,13 +76,13 @@ Worker process exited unexpectedly
     - 可以先看 MetaTube 官方文档和官方项目主页，再按文档部署后端服务
     - [MetaTube 官方文档](https://metatube-community.github.io/)
     - [MetaTube 官方 GitHub](https://github.com/metatube-community)
+    - 也可以搜索：`Huggingface Space MetaTube 搭建`
   - 寻找公共接口：
     - 如果你不想自己搭建，可以自行搜索可用的公共接口服务
     - 建议搜索这些关键词：
       - `MetaTube 部署`
       - `MetaTube Docker`
       - `MetaTube 服务地址`
-      - `jellyfin metatube 服务端url`
       - `MetaTube 公共节点`
 
 ### 🧩 可选
