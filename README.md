@@ -47,6 +47,41 @@ JvedioNext 的目标不是把影片简单列出来，而是把“标准片库”
 
 ---
 
+## 首次启动前请先安装 .NET 8 运行时
+
+当前便携包内的 `Jvedio.Worker.exe` 是 **framework-dependent** 发布方式，首次在新机器上运行前，需要系统里已经安装 `.NET 8` 运行时。
+
+如果启动时看到下面这类提示，通常就是本机缺少对应运行时，导致 Worker 无法拉起：
+
+```text
+引擎启动失败
+Worker process exited unexpectedly
+
+请检查 Worker 是否可用后重启应用
+```
+
+**普通用户推荐安装**
+
+- `ASP.NET Core Runtime 8.0 (Windows x64)`：
+  [官方 .NET 8 下载页](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0)
+- 如果你是开发者，或者本机本来就需要编译本项目，也可以直接安装：
+  在同一页面选择 `SDK 8.0` 安装包即可：
+  [官方 .NET 8 下载页](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0)
+
+**安装后怎么确认**
+
+- 打开 PowerShell，执行 `dotnet --list-runtimes`
+- 输出里至少应包含一行 `Microsoft.AspNetCore.App 8.x.x`
+- 安装完成后重新启动 `JvedioNext.exe`
+
+补充说明：
+
+- 官方支持策略页面当前将 `.NET 8` 标记为 `LTS`：
+  [官方支持策略](https://dotnet.microsoft.com/zh-cn/platform/support/policy)
+- 如果你已经安装过 `.NET`，但仍然报同样错误，优先检查是否只有 `7.x` / `9.x`，而没有 `8.x`
+
+---
+
 ## 设置页概览
 
 设置页当前分为 6 组：`用户数据导入导出`、`基本`、`显示`、`播放器设置`、`MetaTube`、`关于`。
