@@ -55,8 +55,6 @@ JvedioNext 的目标不是把影片简单列出来，而是把“标准片库”
 
 - `.NET 8 ASP.NET Core Runtime (Windows x64)`：
   [官方直达下载（v8.0.25 x64）](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-aspnetcore-8.0.25-windows-x64-installer)
-  
-  ![.NET 8 Runtime 下载提示](./doc/UI/preview/net.png)
 - `.NET 8 Desktop Runtime (Windows x64)`：
   [官方直达下载（v8.0.25 x64）](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-desktop-8.0.25-windows-x64-installer)
   
@@ -86,6 +84,18 @@ Worker process exited unexpectedly
 - 打开 PowerShell，执行 `dotnet --list-runtimes`，确认至少包含 `Microsoft.AspNetCore.App 8.0.25` 和 `Microsoft.WindowsDesktop.App 8.0.25`
 - 进入解压目录后执行 `.\worker\Jvedio.Worker.exe`
 - 如果看到 `Now listening on: http://127.0.0.1:xxxx`，说明 Worker 已可正常启动；如果这里直接报错，把报错原文反馈出来即可
+
+**FFmpeg（可选，仅非标准本地库动态封面需要）**
+
+- 下载地址：
+  [FFmpeg 下载页](https://github.com/GyanD/codexffmpeg/releases)
+- 建议只下载最新的 `essentials_build.7z`
+- 解压后，把 `bin` 目录下这 3 个文件拷贝到软件目录中的 `data/<user>/tools/ffmpeg/`
+  - `ffmpeg.exe`
+  - `ffprobe.exe`
+  - `ffplay.exe`
+- 如果你不确定目录位置，可以先打开软件设置页中的 `打开工具目录`，然后把上述 3 个文件拷进去
+- 如果你只使用标准库抓取元数据，不生成非标准本地库动态封面，可以暂时不安装 `FFmpeg`
 
 ---
 
