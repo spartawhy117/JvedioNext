@@ -53,8 +53,14 @@ JvedioNext 的目标不是把影片简单列出来，而是把“标准片库”
 
 - `.NET 8 ASP.NET Core Runtime (Windows x64)`：
   [官方 .NET 8 下载页](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0)
+  
+  ![.NET 8 Runtime 下载提示](./doc/UI/preview/net.png)
 - `Microsoft Edge WebView2 Runtime`：
   [微软官方 WebView2 下载页](https://developer.microsoft.com/en-us/microsoft-edge/webview2)
+  
+  ![WebView2 Runtime 下载提示](./doc/UI/preview/webview2.png)
+
+Windows 10 及以上系统一般已经预装或通过系统更新带有 `WebView2 Runtime`，多数情况下不需要单独安装；只有在前端窗口打不开、白屏或界面无法渲染时，再优先补装。
 
 如果没有安装：
 
