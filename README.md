@@ -69,35 +69,37 @@ Worker process exited unexpectedly
 
 应用启动后，如果你要使用标准库的元数据抓取功能，还需要准备 `MetaTube` 服务地址：
 
-- `JvedioNext` 不内置公共 `MetaTube` 后端
-- 准备好后，把服务地址填到软件设置页中的 `MetaTube 服务地址`
-- 自己搭建：
-  可以先看 MetaTube 官方文档和官方项目主页，再按文档部署后端服务
-  [MetaTube 官方文档](https://metatube-community.github.io/)
-  [MetaTube 官方 GitHub](https://github.com/metatube-community)
-- 寻找公共接口：
-  如果你不想自己搭建，可以自行搜索可用的公共接口服务，建议搜索这些关键词：
-  `MetaTube 部署`
-  `MetaTube Docker`
-  `MetaTube 服务地址`
-  `Jvedio MetaTube 配置`
-  `MetaTube 公共节点`
+- `MetaTube`
+  - `JvedioNext` 不内置公共 `MetaTube` 后端
+  - 准备好后，把服务地址填到软件设置页中的 `MetaTube 服务地址`
+  - 自己搭建：
+    - 可以先看 MetaTube 官方文档和官方项目主页，再按文档部署后端服务
+    - [MetaTube 官方文档](https://metatube-community.github.io/)
+    - [MetaTube 官方 GitHub](https://github.com/metatube-community)
+  - 寻找公共接口：
+    - 如果你不想自己搭建，可以自行搜索可用的公共接口服务
+    - 建议搜索这些关键词：
+      - `MetaTube 部署`
+      - `MetaTube Docker`
+      - `MetaTube 服务地址`
+      - `Jvedio MetaTube 配置`
+      - `MetaTube 公共节点`
 
 ### 🧩 可选
 
-- `Microsoft Edge WebView2 Runtime`：
-  Windows 10 和 Windows 11 一般已经自带或通过系统更新带有 `WebView2 Runtime`，多数情况下不需要单独安装。
-  只有在前端窗口打不开、白屏或界面无法渲染时，再到这里补装：
-  [微软官方 WebView2 下载页](https://developer.microsoft.com/en-us/microsoft-edge/webview2)
+- `Microsoft Edge WebView2 Runtime` [微软官方 WebView2 下载页](https://developer.microsoft.com/en-us/microsoft-edge/webview2)
+  - Windows 10 和 Windows 11 一般已经自带或通过系统更新带有 `WebView2 Runtime`
+  - 多数情况下不需要单独安装
+  - 只有在前端窗口打不开、白屏或界面无法渲染时，再到这里补装
 
-- `FFmpeg`：
-  只在“非标准本地库生成动态封面”时需要，不影响软件启动，也不影响标准库抓取元数据。
-  下载地址：
-  [FFmpeg 下载页](https://github.com/GyanD/codexffmpeg/releases)
-  建议下载最新的 `essentials_build.zip`。
-  解压后，把 `bin` 目录下这 3 个文件拷贝到软件目录中的 `data/<user>/tools/ffmpeg/`：
-  `ffmpeg.exe`、`ffprobe.exe`、`ffplay.exe`
-  如果你不确定目录位置，可以先打开软件设置页中的 `打开工具目录`，再把这 3 个文件拷进去。
+- `FFmpeg` [FFmpeg 下载页](https://github.com/GyanD/codexffmpeg/releases)
+  - 只在“非标准本地库生成动态封面”时需要，不影响软件启动，也不影响标准库抓取元数据
+  - 建议下载最新的 `essentials_build.zip`
+  - 解压后，把 `bin` 目录下这 3 个文件拷贝到软件目录中的 `data/<user>/tools/ffmpeg/`
+    - `ffmpeg.exe`
+    - `ffprobe.exe`
+    - `ffplay.exe`
+  - 如果你不确定目录位置，可以先打开软件设置页中的 `打开工具目录`，再把这 3 个文件拷进去
 
 ---
 
