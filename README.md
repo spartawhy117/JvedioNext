@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="./.github/assets/readme-icon.svg" alt="JvedioNext" width="128" />
+  <img src="./doc/UI/preview/readme-icon.svg" alt="JvedioNext" width="128" />
   <br>
   JvedioNext
 </h1>
@@ -28,11 +28,11 @@ JvedioNext 的目标不是把影片简单列出来，而是把“标准片库”
 
 | 暗色 | 浅色 |
 | --- | --- |
-| ![影片库暗色预览](./.github/assets/readme-preview-dark.png) | ![影片库亮色预览](./.github/assets/readme-preview-light.png) |
+| ![影片库暗色预览](./doc/UI/preview/dark.png) | ![影片库亮色预览](./doc/UI/preview/light.png) |
 
 | 设置页 | 演员页 |
 | --- | --- |
-| ![设置页预览](./.github/assets/readme-preview-setting.png) | ![演员页预览](./.github/assets/readme-preview-actors.png) |
+| ![设置页预览](./doc/UI/preview/setting.png) | ![演员页预览](./doc/UI/preview/actors.png) |
 
 ---
 
