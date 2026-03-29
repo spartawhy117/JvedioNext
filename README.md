@@ -82,7 +82,7 @@ Worker process exited unexpectedly
       - `MetaTube 部署`
       - `MetaTube Docker`
       - `MetaTube 服务地址`
-      - `Jvedio MetaTube 配置`
+      - `jellyfin metatube 服务端url`
       - `MetaTube 公共节点`
 
 ### 🧩 可选
