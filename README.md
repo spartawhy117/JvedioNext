@@ -49,12 +49,16 @@ JvedioNext 的目标不是把影片简单列出来，而是把“标准片库”
 
 ## ⚠️ 首次启动前请先安装启动依赖
 
-首次在新机器上运行便携包前，请先安装这 2 项：
+首次在新机器上运行便携包前，请先安装这 3 项：
 
 - `.NET 8 ASP.NET Core Runtime (Windows x64)`：
-  [官方 .NET 8 下载页](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0)
+  [官方直达下载（v8.0.25 x64）](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-aspnetcore-8.0.25-windows-x64-installer)
   
   ![.NET 8 Runtime 下载提示](./doc/UI/preview/net.png)
+- `.NET 8 Desktop Runtime (Windows x64)`：
+  [官方直达下载（v8.0.25 x64）](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-desktop-8.0.25-windows-x64-installer)
+  
+  当前用户反馈部分机器还需要补装 `Desktop Runtime`，并且建议直接安装 `v8.0.25`，低版本不要混用。
 - `Microsoft Edge WebView2 Runtime`：
   [微软官方 WebView2 下载页](https://developer.microsoft.com/en-us/microsoft-edge/webview2)
   
@@ -64,7 +68,7 @@ Windows 10 及以上系统一般已经预装或通过系统更新带有 `WebView
 
 如果没有安装：
 
-- 缺少 `.NET 8` 时，`Jvedio.Worker.exe` 无法启动，通常会看到：
+- 缺少 `.NET 8 ASP.NET Core Runtime` 或 `.NET 8 Desktop Runtime` 时，`Jvedio.Worker.exe` 可能无法正常启动，通常会看到：
 
 ```text
 引擎启动失败
@@ -77,7 +81,7 @@ Worker process exited unexpectedly
 
 **安装后怎么快速验证**
 
-- 打开 PowerShell，执行 `dotnet --list-runtimes`，确认包含 `Microsoft.AspNetCore.App 8.0.x`
+- 打开 PowerShell，执行 `dotnet --list-runtimes`，确认至少包含 `Microsoft.AspNetCore.App 8.0.25` 和 `Microsoft.WindowsDesktop.App 8.0.25`
 - 进入解压目录后执行 `.\worker\Jvedio.Worker.exe`
 - 如果看到 `Now listening on: http://127.0.0.1:xxxx`，说明 Worker 已可正常启动；如果这里直接报错，把报错原文反馈出来即可
 
