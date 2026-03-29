@@ -51,6 +51,8 @@ JvedioNext 的目标不是把影片简单列出来，而是把“标准片库”
 
 首次在新机器上运行便携包前，请先安装这 3 项：
 
+默认推荐安装 `x64` 版本；如果你的系统是 `32` 位 Windows，请自行改装对应的 `x86` 版本。
+
 - `.NET 8 ASP.NET Core Runtime (Windows x64)`：
   [官方直达下载（v8.0.25 x64）](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-aspnetcore-8.0.25-windows-x64-installer)
   
