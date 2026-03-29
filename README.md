@@ -47,28 +47,18 @@ JvedioNext 的目标不是把影片简单列出来，而是把“标准片库”
 
 ---
 
-## ⚠️ 首次启动前请先安装启动依赖
-
-首次在新机器上运行便携包前，请先安装这 3 项：
+## ⚠️ 首次启动前请先准备环境
 
 默认推荐安装 `x64` 版本；如果你的系统是 `32` 位 Windows，请自行改装对应的 `x86` 版本。
+
+### ✅ 必选
 
 - `.NET 8 ASP.NET Core Runtime (Windows x64)`：
   [官方直达下载（v8.0.25 x64）](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-aspnetcore-8.0.25-windows-x64-installer)
 - `.NET 8 Desktop Runtime (Windows x64)`：
   [官方直达下载（v8.0.25 x64）](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-desktop-8.0.25-windows-x64-installer)
-  
-  当前用户反馈部分机器还需要补装 `Desktop Runtime`，并且建议直接安装 `v8.0.25`，低版本不要混用。
-- `Microsoft Edge WebView2 Runtime`：
-  [微软官方 WebView2 下载页](https://developer.microsoft.com/en-us/microsoft-edge/webview2)
-  
-  ![WebView2 Runtime 下载提示](./doc/UI/preview/webview2.png)
 
-Windows 10 及以上系统一般已经预装或通过系统更新带有 `WebView2 Runtime`，多数情况下不需要单独安装；只有在前端窗口打不开、白屏或界面无法渲染时，再优先补装。
-
-如果没有安装：
-
-- 缺少 `.NET 8 ASP.NET Core Runtime` 或 `.NET 8 Desktop Runtime` 时，`Jvedio.Worker.exe` 可能无法正常启动，通常会看到：
+缺少以上任一 `.NET 8` 运行时，`Jvedio.Worker.exe` 都可能无法正常启动，通常会看到：
 
 ```text
 引擎启动失败
@@ -77,25 +67,27 @@ Worker process exited unexpectedly
 请检查 Worker 是否可用后重启应用
 ```
 
-- 缺少 `WebView2 Runtime` 时，前端窗口可能无法正常打开，或出现白屏、界面无法渲染。
+应用启动后，如果你要使用标准库的元数据抓取功能，还需要准备 `MetaTube` 服务地址：
 
-**安装后怎么快速验证**
+- `JvedioNext` 不内置公共 `MetaTube` 后端
+- 你需要自己搭建 `MetaTube` 后端，或自行寻找可用的公共接口服务
+- 准备好后，把服务地址填到软件设置页中的 `MetaTube 服务地址`
 
-- 打开 PowerShell，执行 `dotnet --list-runtimes`，确认至少包含 `Microsoft.AspNetCore.App 8.0.25` 和 `Microsoft.WindowsDesktop.App 8.0.25`
-- 进入解压目录后执行 `.\worker\Jvedio.Worker.exe`
-- 如果看到 `Now listening on: http://127.0.0.1:xxxx`，说明 Worker 已可正常启动；如果这里直接报错，把报错原文反馈出来即可
+### 🧩 可选
 
-**FFmpeg（可选，仅非标准本地库动态封面需要）**
+- `Microsoft Edge WebView2 Runtime`：
+  Windows 10 和 Windows 11 一般已经自带或通过系统更新带有 `WebView2 Runtime`，多数情况下不需要单独安装。
+  只有在前端窗口打不开、白屏或界面无法渲染时，再到这里补装：
+  [微软官方 WebView2 下载页](https://developer.microsoft.com/en-us/microsoft-edge/webview2)
 
-- 下载地址：
+- `FFmpeg`：
+  只在“非标准本地库生成动态封面”时需要，不影响软件启动，也不影响标准库抓取元数据。
+  下载地址：
   [FFmpeg 下载页](https://github.com/GyanD/codexffmpeg/releases)
-- 建议只下载最新的 `essentials_build.7z`
-- 解压后，把 `bin` 目录下这 3 个文件拷贝到软件目录中的 `data/<user>/tools/ffmpeg/`
-  - `ffmpeg.exe`
-  - `ffprobe.exe`
-  - `ffplay.exe`
-- 如果你不确定目录位置，可以先打开软件设置页中的 `打开工具目录`，然后把上述 3 个文件拷进去
-- 如果你只使用标准库抓取元数据，不生成非标准本地库动态封面，可以暂时不安装 `FFmpeg`
+  建议下载最新的 `essentials_build.zip`。
+  解压后，把 `bin` 目录下这 3 个文件拷贝到软件目录中的 `data/<user>/tools/ffmpeg/`：
+  `ffmpeg.exe`、`ffprobe.exe`、`ffplay.exe`
+  如果你不确定目录位置，可以先打开软件设置页中的 `打开工具目录`，再把这 3 个文件拷进去。
 
 ---
 
@@ -318,38 +310,3 @@ data/<user>/cache/video-preview/<libraryId>/<videoId>/
 - `编辑`：修改库名、扫描目录和“合集目录列表”；是否填写、是否勾选“下一层子目录按合集显示”，会直接改变库首页和合集页的展示层级。
 - `移除库`：只移除软件内数据与对应缓存映射，不修改原影片目录内容。
 
----
-
-## 关于组件与获取方式
-
-**FFmpeg 是做什么的**
-
-- `FFmpeg` 只用于非标准本地库生成动态封面相关资产，包括静态封面和 `preview.mp4` 预览缓存。
-- 它不是影片抓取服务，也不负责识别番号或补元数据。
-
-**FFmpeg 怎么获取**
-
-- 程序不强制内置最新 `FFmpeg`。
-- 你可以使用系统环境里已经配置好的 `ffmpeg.exe` 和 `ffprobe.exe`。
-- 也可以自己准备可执行文件，并按设置页提示放到工具目录中。
-- 当前推荐版本是 `8.1.0`，设置页会提供下载页入口和工具目录入口。
-
-**MetaTube 是做什么的**
-
-- `MetaTube` 是当前唯一元数据来源，负责返回影片标题、海报、`NFO`、演员和头像等抓取结果。
-- 你可以把它理解成一个专门给 JvedioNext 提供影视资料的后端接口。
-- JvedioNext 本身不直接内置这些抓取规则，而是通过这个服务地址去请求数据。
-
-**MetaTube 服务地址怎么获取**
-
-- `MetaTube 服务地址` 通常是一个 HTTP 或 HTTPS 地址，例如 `http://127.0.0.1:8080` 或 `http://你的局域网IP:端口`。
-- 如果你自己部署，可以在本机、NAS、家用服务器或云服务器上部署 MetaTube，然后把对应地址填进设置页。
-- 如果你不自己部署，也可以去社区搜索 `MetaTube 部署`、`MetaTube Docker`、`MetaTube 服务地址`、`Jvedio MetaTube 配置`、`MetaTube 公共节点` 这类关键词，先理解服务端怎么启动、默认端口是什么、外部应填写哪个 URL。
-- 如果你想先看官方项目说明，可以先阅读 MetaTube 官方 Go 仓库：[metatube-community/metatube-sdk-go](https://github.com/metatube-community/metatube-sdk-go)。
-- 判断一个地址是否大概率可用，可以先看它是否是完整的 `http://` 或 `https://` 地址、端口已写明、当前机器可访问，并且在设置页点击 `测试连通性` 后能够返回成功。
-- JvedioNext 只负责连接这个地址并执行连通性测试，不内置公共服务端，也不会自动分发后端地址。
-
-**JvedioNext exe 怎么获取**
-
-- 桌面端使用的是打包后的 `JvedioNext.exe` 便携版本。
-- 正常使用时直接下载项目提供的便携包，解压后运行即可。
