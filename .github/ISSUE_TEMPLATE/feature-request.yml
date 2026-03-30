@@ -1,0 +1,89 @@
+name: 功能建议
+description: 提交新功能、交互改进或现有行为优化建议
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请尽量先说清楚当前痛点，再描述你想要的改动。
+        如果只是提问或排障，请改用“使用咨询”或“缺陷反馈”模板。
+        如果这个建议源自实际异常或失败日志，也请一并上传相关日志片段或截图。
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我已经搜索过现有 issue，确认这个建议没有被重复提出。
+          required: true
+        - label: 我确认这不是使用问题或环境配置问题。
+          required: true
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: 涉及模块
+      description: 选择最接近的功能范围，工作流会自动补对应模块标签。
+      options:
+        - 标准库
+        - MetaTube
+        - 扫描整理
+        - UI
+        - 其它
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 当前版本
+      description: 请写明当前软件版本、便携包名或提交号，便于确认建议对应的实现阶段。
+      placeholder: 例如 0.15.1
+    validations:
+      required: true
+
+  - type: textarea
+    id: pain
+    attributes:
+      label: 当前痛点
+      description: 先描述现状为什么不好用，或者当前流程哪里不顺。
+      placeholder: 例如当前只能逐个库手动执行，批量处理路径过长时效率很低。
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 期望的改动
+      description: 具体说明你想新增或调整什么，以及你预期的效果。
+      placeholder: 例如希望在库列表页增加批量扫描入口，并显示总进度。
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternative
+    attributes:
+      label: 备选方案或临时方案
+      description: 如果你已经尝试过其它做法，也可以写在这里。
+      placeholder: 例如目前只能通过脚本批量调用接口，但普通用户难以使用。
+    validations:
+      required: false
+
+  - type: textarea
+    id: more
+    attributes:
+      label: 补充信息
+      description: 可补充草图、示例场景、目标用户、优先级判断依据等。
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志或截图
+      description: 如果建议来自实际异常、失败路径或现有行为缺陷，建议附上日志片段或截图。
+      placeholder: 例如某次扫描失败日志、界面提示截图或任务记录片段
+    validations:
+      required: false

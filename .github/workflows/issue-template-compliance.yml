@@ -1,0 +1,254 @@
+name: issue-template-compliance
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate issue template compliance
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const issueNumber = issue.number;
+            const body = issue.body || "";
+            const title = (issue.title || "").trim();
+            const existingLabels = issue.labels.map(label => label.name);
+
+            const complianceLabel = "needs:compliance";
+            const complianceMarker = "<!-- issue-template-compliance -->";
+            const managedAreaLabels = ["library", "metatube", "scan", "ui"];
+            const moduleLabelMap = {
+              "标准库": "library",
+              "MetaTube": "metatube",
+              "扫描整理": "scan",
+              "UI": "ui",
+            };
+
+            function escapeRegExp(text) {
+              return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            }
+
+            function extractSection(heading) {
+              const pattern = new RegExp(`###\\s+${escapeRegExp(heading)}\\s*\\n([\\s\\S]*?)(?=\\n###\\s+|$)`, "m");
+              const match = body.match(pattern);
+              return match ? match[1].trim() : "";
+            }
+
+            function normalize(text) {
+              return (text || "")
+                .replace(/\r/g, "")
+                .replace(/_No response_/gi, "")
+                .replace(/<!--[\s\S]*?-->/g, "")
+                .trim();
+            }
+
+            function hasRealContent(text, minLength = 6) {
+              const normalized = normalize(text).replace(/\s+/g, " ").trim();
+              if (!normalized) return false;
+              if (normalized.length < minLength) return false;
+              if (!/[\p{L}\p{N}]/u.test(normalized)) return false;
+              const placeholderPatterns = [
+                /^请填写/,
+                /^待补充/,
+                /^暂无$/,
+                /^无$/,
+                /^test$/i,
+              ];
+              return !placeholderPatterns.some(pattern => pattern.test(normalized));
+            }
+
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                  color,
+                  description,
+                });
+              }
+            }
+
+            async function addLabel(name) {
+              if (existingLabels.includes(name)) return;
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                labels: [name],
+              });
+            }
+
+            async function removeLabel(name) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  name,
+                });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+              }
+            }
+
+            async function getComplianceComment() {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                per_page: 100,
+              });
+              return comments.find(comment => comment.body && comment.body.includes(complianceMarker));
+            }
+
+            const moduleText = normalize(extractSection("涉及模块"));
+            const targetModuleLabel = moduleLabelMap[moduleText] || null;
+
+            for (const areaLabel of managedAreaLabels) {
+              if (areaLabel !== targetModuleLabel && existingLabels.includes(areaLabel)) {
+                await removeLabel(areaLabel);
+              }
+            }
+
+            if (targetModuleLabel && !existingLabels.includes(targetModuleLabel)) {
+              await addLabel(targetModuleLabel);
+            }
+
+            let issueType = null;
+            if (existingLabels.includes("bug")) {
+              issueType = "bug";
+            } else if (existingLabels.includes("enhancement")) {
+              issueType = "feature";
+            } else if (existingLabels.includes("question")) {
+              issueType = "question";
+            } else if (body.includes("### 问题描述") && body.includes("### 复现步骤")) {
+              issueType = "bug";
+            } else if (body.includes("### 当前痛点") && body.includes("### 期望的改动")) {
+              issueType = "feature";
+            } else if (body.includes("### 我想咨询的问题")) {
+              issueType = "question";
+            }
+
+            const violations = [];
+
+            if (!issueType) {
+              violations.push("未使用仓库提供的中文 Issue 模板，请从“缺陷反馈 / 功能建议 / 使用咨询”入口重新提交。");
+            }
+
+            const titleWithoutPrefix = title
+              .replace(/^\[(Bug|Feature|Question)\]\s*/i, "")
+              .trim();
+            if (!hasRealContent(titleWithoutPrefix, 4)) {
+              violations.push("标题过短或只保留了模板前缀，请把主题写具体。");
+            }
+
+            if (issueType === "bug") {
+              if (!hasRealContent(extractSection("问题描述"), 10)) {
+                violations.push("“问题描述”没有写清楚实际现象。");
+              }
+              if (!hasRealContent(extractSection("复现步骤"), 6)) {
+                violations.push("“复现步骤”内容不足，无法据此稳定复现。");
+              }
+              if (!hasRealContent(extractSection("期望结果"), 4)) {
+                violations.push("“期望结果”为空，请说明正常情况下应该发生什么。");
+              }
+              if (!hasRealContent(extractSection("实际结果"), 4)) {
+                violations.push("“实际结果”为空，请说明现在实际发生了什么。");
+              }
+              if (!hasRealContent(extractSection("当前版本"), 3)) {
+                violations.push("“当前版本”为空，请至少提供版本号、便携包名或提交号。");
+              }
+              if (!hasRealContent(extractSection("系统环境"), 3)) {
+                violations.push("“系统环境”为空，请至少提供操作系统与关键运行环境。");
+              }
+            }
+
+            if (issueType === "feature") {
+              if (!/^\[Feature\]\s+\S+/i.test(title)) {
+                violations.push("功能建议标题请以 `[Feature] ` 开头，并在后面补充简短主题。");
+              }
+              if (!/\- \[x\]/i.test(extractSection("提交前确认"))) {
+                violations.push("“提交前确认”未勾选完成。");
+              }
+              if (!hasRealContent(extractSection("当前版本"), 3)) {
+                violations.push("“当前版本”为空，请至少提供版本号、便携包名或提交号。");
+              }
+              if (!hasRealContent(extractSection("当前痛点"), 10)) {
+                violations.push("“当前痛点”内容不足，请先说明现状为什么不好用。");
+              }
+              if (!hasRealContent(extractSection("期望的改动"), 10)) {
+                violations.push("“期望的改动”内容不足，请说清楚想新增或调整什么。");
+              }
+            }
+
+            if (issueType === "question") {
+              if (!/^\[Question\]\s+\S+/i.test(title)) {
+                violations.push("使用咨询标题请以 `[Question] ` 开头，并在后面补充简短主题。");
+              }
+              if (!hasRealContent(extractSection("我想咨询的问题"), 8)) {
+                violations.push("“我想咨询的问题”内容不足，请把问题写完整。");
+              }
+            }
+
+            const existingComment = await getComplianceComment();
+
+            if (violations.length > 0) {
+              await ensureLabel(complianceLabel, "B60205", "Issue 模板未通过自动检查");
+              await addLabel(complianceLabel);
+
+              const commentBody = `${complianceMarker}
+            这个 issue 目前没有通过模板检查。
+
+            **需要补充的内容：**
+            ${violations.map(item => `- ${item}`).join("\n")}
+
+            请在 **2 小时** 内编辑当前 issue 完成补充；超时后系统会自动关闭。
+            如果你认为这是误判，可以直接回复说明。`;
+
+              if (existingComment) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existingComment.id,
+                  body: commentBody,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body: commentBody,
+                });
+              }
+
+              core.info(`Issue #${issueNumber} failed compliance: ${violations.join("; ")}`);
+              return;
+            }
+
+            await removeLabel(complianceLabel);
+
+            if (existingComment) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+              });
+            }
+
+            core.info(`Issue #${issueNumber} passed compliance.`);

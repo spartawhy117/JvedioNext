@@ -1,0 +1,69 @@
+name: 使用咨询
+description: 提交使用问题、配置疑问或行为确认
+title: "[Question] "
+labels:
+  - question
+body:
+  - type: markdown
+    attributes:
+      value: |
+        如果问题其实已经稳定复现为缺陷，请改用“缺陷反馈”模板。
+        如果只是想确认功能方向或交互建议，请改用“功能建议”模板。
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: 涉及模块
+      description: 选择最接近的范围，工作流会自动补对应模块标签。
+      options:
+        - 标准库
+        - MetaTube
+        - 扫描整理
+        - UI
+        - 其它
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: 我想咨询的问题
+      description: 把问题直接写清楚，避免只写“不能用”“没效果”之类的短句。
+      placeholder: 例如导入用户数据后，为什么某些影片不会自动触发完整重抓？
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: 我已尝试过的操作
+      description: 简要说明你已经查过什么、试过什么，避免重复沟通。
+      placeholder: 例如已经重新扫描库、检查 MetaTube 地址、查看 worker 日志。
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: 当前版本
+      description: 如方便，请写明版本或当前便携包名称。
+      placeholder: 例如 0.15.1
+    validations:
+      required: false
+
+  - type: input
+    id: environment
+    attributes:
+      label: 系统环境
+      description: 如与问题相关，请写明系统和运行环境。
+      placeholder: 例如 Windows 10 x64
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关截图或日志
+      description: 如有报错界面、日志片段或目录结构，建议一并提供。
+    validations:
+      required: false

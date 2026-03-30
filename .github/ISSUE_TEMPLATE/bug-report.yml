@@ -1,0 +1,105 @@
+name: 缺陷反馈
+description: 反馈实际存在的问题、异常或回归
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请尽量提供可复现的信息。
+        请尽量上传 `log/runtime/` 下相关日志片段、报错截图或样例路径，处理会更快。
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我已经搜索过现有 issue，确认这不是重复反馈。
+          required: true
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: 涉及模块
+      description: 选择最接近的问题范围，工作流会自动补对应模块标签。
+      options:
+        - 标准库
+        - MetaTube
+        - 扫描整理
+        - UI
+        - 其它
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 当前版本
+      description: 例如 `0.15.1`、某次便携版包名，或当前分支提交号。
+      placeholder: 例如 0.15.1
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: 系统环境
+      description: 请写明操作系统、架构和必要运行环境。
+      placeholder: 例如 Windows 11 23H2 x64，.NET 8 Runtime 已安装
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 说明你遇到了什么问题，尽量写清楚现象和影响范围。
+      placeholder: 例如扫描后界面一直显示处理中，但库内影片没有新增。
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 用尽量稳定的步骤描述如何复现。
+      placeholder: |
+        1. 打开……
+        2. 点击……
+        3. 看到……
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望结果
+      placeholder: 例如应当成功入库并刷新影片列表。
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际结果
+      placeholder: 例如任务结束后列表无变化，日志里出现超时异常。
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志或截图
+      description: 建议直接上传日志片段、报错截图，或说明截图内容与路径。
+      placeholder: 例如 log/runtime/worker-20260331.log 中的异常片段
+    validations:
+      required: false
+
+  - type: textarea
+    id: more
+    attributes:
+      label: 补充信息
+      description: 其它你认为有帮助的背景、输入样例、目录结构等。
+    validations:
+      required: false
