@@ -151,28 +151,22 @@ jobs:
               issueType = "bug";
             } else if (existingLabels.includes("enhancement")) {
               issueType = "feature";
-            } else if (existingLabels.includes("question")) {
-              issueType = "question";
             } else if (body.includes("### 日志压缩包或日志内容")) {
               issueType = "bug";
-            } else if (body.includes("### 问题 / 建议内容")) {
+            } else if (body.includes("### 建议内容")) {
               issueType = "feature";
-            } else if (body.includes("### 当前操作方式 / 已尝试内容")) {
-              issueType = "question";
             }
 
             const violations = [];
 
             if (!issueType) {
-              violations.push("未使用仓库提供的中文 Issue 模板，请从“缺陷反馈 / 功能建议 / 使用咨询”入口重新提交。");
+              violations.push("未使用仓库提供的中文 Issue 模板，请从“缺陷反馈”或“功能建议”入口重新提交。");
             }
 
-            const titleWithoutPrefix = title
-              .replace(/^\[(Bug|Feature|Question)\]\s*/i, "")
-              .trim();
-            if (!hasRealContent(titleWithoutPrefix, 4)) {
-              violations.push("标题过短或只保留了模板前缀，请把主题写具体。");
+            if (issueType === "bug" && !hasRealContent(title, 4)) {
+              violations.push("标题过短，请把问题主题写具体。");
             }
+
             if (selectedModules.length === 0) {
               violations.push("“涉及模块”至少勾选一项。");
             }
@@ -193,26 +187,11 @@ jobs:
             }
 
             if (issueType === "feature") {
-              if (!hasRealContent(extractSection("问题 / 建议内容"), 8)) {
-                violations.push("“问题 / 建议内容”内容不足，请把建议本身写清楚。");
+              if (!hasRealContent(extractSection("建议内容"), 8)) {
+                violations.push("“建议内容”内容不足，请把你想改什么写清楚。");
               }
-              if (!hasRealContent(extractSection("当前操作方式 / 使用场景"), 6)) {
-                violations.push("“当前操作方式 / 使用场景”内容不足，请说明你现在是怎么操作的。");
-              }
-              if (!hasRealContent(extractSection("软件版本号"), 3)) {
-                violations.push("“软件版本号”为空，请至少提供版本号、便携包名或提交号。");
-              }
-            }
-
-            if (issueType === "question") {
-              if (!hasRealContent(extractSection("问题"), 8)) {
-                violations.push("“问题”内容不足，请把咨询内容写完整。");
-              }
-              if (!hasRealContent(extractSection("当前操作方式 / 已尝试内容"), 6)) {
-                violations.push("“当前操作方式 / 已尝试内容”内容不足，请说明你现在是怎么操作的。");
-              }
-              if (!hasRealContent(extractSection("软件版本号"), 3)) {
-                violations.push("“软件版本号”为空，请至少提供版本号、便携包名或提交号。");
+              if (!hasRealContent(extractSection("使用场景 / 当前操作方式"), 6)) {
+                violations.push("“使用场景 / 当前操作方式”内容不足，请说明建议出现在哪个场景里。");
               }
             }
 

@@ -1,13 +1,14 @@
 name: 功能建议
-description: 提交新功能、交互改进或现有行为优化建议
-title: "[Feature] "
+description: 提交新功能或现有行为优化建议
+title: ""
 labels:
   - enhancement
 body:
   - type: markdown
     attributes:
       value: |
-        请尽量精简描述，重点写“你遇到的问题”和“你现在是怎么操作的”。
+        这个模板比 `BUG` 反馈更轻量。
+        请至少说明你想改什么，以及它出现在什么模块或使用场景里。
 
   - type: checkboxes
     id: module
@@ -22,29 +23,28 @@ body:
         - label: UI
         - label: 其它
 
-  - type: input
-    id: version
+  - type: textarea
+    id: suggestion
     attributes:
-      label: 软件版本号
-      description: 请填写当前软件版本、便携包名或提交号。
-      placeholder: 例如 0.15.1
+      label: 建议内容
+      description: 直接写你希望新增、调整或优化什么。
+      placeholder: 例如希望在库列表页增加批量扫描入口。
     validations:
       required: true
 
   - type: textarea
-    id: problem
+    id: scene
     attributes:
-      label: 问题 / 建议内容
-      description: 直接写你想解决的问题，或者你希望增加什么能力。
-      placeholder: 例如批量扫描入口太深，希望在库列表页直接触发。
-    validations:
-      required: true
-
-  - type: textarea
-    id: steps
-    attributes:
-      label: 当前操作方式 / 使用场景
-      description: 说明你现在是怎么操作的，或者这个需求出现在哪个使用场景里。
+      label: 使用场景 / 当前操作方式
+      description: 简要说明这个建议出现在哪个使用场景里，或你现在是怎么操作的。
       placeholder: 例如现在需要逐个进入库详情页点扫描，连续整理多个库时很慢。
     validations:
       required: true
+
+  - type: textarea
+    id: more
+    attributes:
+      label: 补充说明
+      description: 可选。补充截图、草图、参考方案或其它说明。
+    validations:
+      required: false
