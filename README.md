@@ -11,12 +11,10 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Windows-blue" alt="Platform" />
   <img src="https://img.shields.io/badge/.NET-8.0-purple" alt=".NET" />
+  <img src="https://img.shields.io/badge/Tauri-2-24C8D8?logo=tauri&logoColor=white" alt="Tauri" />
   <img src="https://img.shields.io/badge/license-MIT-green" alt="license" />
   <a href="https://github.com/spartawhy117/JvedioNext">
     <img src="https://img.shields.io/github/stars/spartawhy117/JvedioNext?style=social" alt="Stars" />
-  </a>
-  <a href="https://github.com/spartawhy117/JvedioNext">
-    <img src="https://img.shields.io/github/forks/spartawhy117/JvedioNext?style=social" alt="Forks" />
   </a>
 </p>
 
