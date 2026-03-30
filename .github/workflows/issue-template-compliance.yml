@@ -187,6 +187,9 @@ jobs:
             }
 
             if (issueType === "feature") {
+              if (!/^\[Feature\]\s+\S+/i.test(title)) {
+                violations.push("功能建议标题请以 `[Feature] ` 开头，并在后面补充简短主题。");
+              }
               if (!hasRealContent(extractSection("建议内容"), 8)) {
                 violations.push("“建议内容”内容不足，请把你想改什么写清楚。");
               }

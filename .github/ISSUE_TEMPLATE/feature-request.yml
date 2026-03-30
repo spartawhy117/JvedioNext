@@ -1,6 +1,6 @@
 name: 功能建议
 description: 提交新功能或现有行为优化建议
-title: ""
+title: "[Feature] "
 labels:
   - enhancement
 body:
