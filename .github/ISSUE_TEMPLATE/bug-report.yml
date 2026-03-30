@@ -57,7 +57,7 @@ body:
     id: logs
     attributes:
       label: 日志压缩包或日志内容
-      description: 必填。请把软件根目录下的 `log/` 文件夹压缩后上传到这里，也可以补充关键报错截图或日志片段。
-      placeholder: 请把压缩包直接拖到这个输入框中上传
+      description: 必填。请把软件根目录下的 `log/` 文件夹压缩后上传到这里，也可以补充关键报错截图或日志片段。只写“已上传”“见附件”这类占位文字不会通过检查。
+      placeholder: 请把压缩包直接拖到这个输入框中上传，并补一行说明文件内容
     validations:
       required: true
