@@ -322,3 +322,22 @@ data/<user>/cache/video-preview/<libraryId>/<videoId>/
 - `编辑`：修改库名、扫描目录和“合集目录列表”；是否填写、是否勾选“下一层子目录按合集显示”，会直接改变库首页和合集页的展示层级。
 - `移除库`：只移除软件内数据与对应缓存映射，不修改原影片目录内容。
 
+---
+
+## 致谢
+
+本项目在开发过程中参考了以下优秀开源项目，在此表示感谢：
+
+- [clash-verge-rev](https://github.com/clash-verge-rev/clash-verge-rev) — Tauri 2 桌面应用架构与前端工程实践参考
+- [metatube-sdk-go](https://github.com/metatube-community/metatube-sdk-go) — 元数据搜刮能力支持
+- [jvedio](https://github.com/hitchao/jvedio) — 原版 jvedio 提供了离线影片管理的核心理念参考
+
+---
+
+## 特别声明
+
+本软件（JvedioNext）**仅用于管理用户个人本地影片**，所有数据处理均在本地离线运行。
+
+本软件**不提供任何非法内容分享功能**，不内置任何影片资源，不具备上传、分发或传播影片内容的能力。用户须自行确保所管理的内容符合所在地区的法律法规，开发者对用户的使用行为不承担任何法律责任。
+
+
