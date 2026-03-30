@@ -8,6 +8,18 @@
   次世代离线小电影管理软件，面向个人收藏、标准片库与非规则本地资源的统一管理。
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Windows-blue" alt="Platform" />
+  <img src="https://img.shields.io/badge/.NET-8.0-purple" alt=".NET" />
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="license" />
+  <a href="https://github.com/spartawhy117/JvedioNext">
+    <img src="https://img.shields.io/github/stars/spartawhy117/JvedioNext?style=social" alt="Stars" />
+  </a>
+  <a href="https://github.com/spartawhy117/JvedioNext">
+    <img src="https://img.shields.io/github/forks/spartawhy117/JvedioNext?style=social" alt="Forks" />
+  </a>
+</p>
+
 JvedioNext 的目标不是把影片简单列出来，而是把“标准片库”和“自己长期积累的杂乱本地资源”统一收进一个可维护、可浏览、可迁移的离线媒体库里。当前唯一搜刮源为 MetaTube，同时提供“标准库”和“非标准本地库”两种管理模式。
 
 > 这套方案的一个关键升级，是首次把非规则目录的管理当成正式能力来做，而不是默认所有影片都必须符合番号库规范。对于用户自己搜集的某些国产电影合集、散装目录、按主题或人物手工分类的本地资源，JvedioNext 现在可以在不改原目录结构的前提下，通过“合集目录列表”和动态封面能力，把原本难管理、难浏览、难迁移的内容收敛成可以持续维护的离线库。
