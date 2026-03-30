@@ -23,7 +23,9 @@ jobs:
             const existingLabels = issue.labels.map(label => label.name);
 
             const complianceLabel = "needs:compliance";
+            const triageLabel = "needs:triage";
             const complianceMarker = "<!-- issue-template-compliance -->";
+            const otherModuleMarker = "<!-- issue-other-module-reminder -->";
             const managedAreaLabels = ["library", "标准库", "非标准库", "metatube", "scan", "ui", "other"];
             const moduleLabelMap = {
               "标准库": { name: "标准库", color: "1D76DB", description: "标准番号库相关问题或建议" },
@@ -162,6 +164,15 @@ jobs:
               return comments.find(comment => comment.body && comment.body.includes(complianceMarker));
             }
 
+            async function getComments() {
+              return github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                per_page: 100,
+              });
+            }
+
             const selectedModules = extractCheckedOptions("涉及模块");
             const targetModuleLabels = selectedModules
               .map(moduleName => moduleLabelMap[moduleName] || null)
@@ -193,6 +204,8 @@ jobs:
             }
 
             const violations = [];
+            const hasSelectedOther = selectedModules.includes("其它");
+            const missingModuleSelection = selectedModules.length === 0;
 
             if (!issueType) {
               violations.push("未使用仓库提供的中文 Issue 模板，请从“缺陷反馈”或“功能建议”入口重新提交。");
@@ -202,7 +215,7 @@ jobs:
               violations.push("标题过短，请把问题主题写具体。");
             }
 
-            if (selectedModules.length === 0) {
+            if (missingModuleSelection) {
               violations.push("“涉及模块”至少勾选一项。");
             }
 
@@ -243,7 +256,38 @@ jobs:
               }
             }
 
-            const existingComment = await getComplianceComment();
+            const comments = await getComments();
+            const existingComment = comments.find(comment => comment.body && comment.body.includes(complianceMarker));
+            const existingOtherModuleComment = comments.find(comment => comment.body && comment.body.includes(otherModuleMarker));
+
+            await ensureLabel(triageLabel, "C2E0C6", "缺少明确模块归类，等待人工分诊");
+            if (issueType === "bug" && missingModuleSelection) {
+              await addLabel(triageLabel);
+            } else if (existingLabels.includes(triageLabel)) {
+              await removeLabel(triageLabel);
+            }
+
+            if (issueType === "feature" && hasSelectedOther) {
+              const otherCommentBody = `${otherModuleMarker}
+            你当前勾选了“其它”模块。
+
+            如果这个建议其实可以归到更具体的模块，例如“标准库 / 非标准库 / MetaTube / 扫描整理 / UI”，建议直接改成更明确的模块，后续处理会更快。`;
+
+              if (!existingOtherModuleComment) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body: otherCommentBody,
+                });
+              }
+            } else if (existingOtherModuleComment) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingOtherModuleComment.id,
+              });
+            }
 
             if (violations.length > 0) {
               await ensureLabel(complianceLabel, "B60205", "Issue 模板未通过自动检查");
