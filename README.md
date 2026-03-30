@@ -9,6 +9,12 @@
 </p>
 
 <p align="center">
+  <a href="./CHANGELOG.md">版本更新记录</a>
+  ·
+  <a href="https://github.com/spartawhy117/JvedioNext/releases/latest">最新版本下载</a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Platform-Windows-blue" alt="Platform" />
   <img src="https://img.shields.io/badge/.NET-8.0-purple" alt=".NET" />
   <img src="https://img.shields.io/badge/Tauri-2-24C8D8?logo=tauri&logoColor=white" alt="Tauri" />
