@@ -7,83 +7,44 @@ body:
   - type: markdown
     attributes:
       value: |
-        请尽量先说清楚当前痛点，再描述你想要的改动。
-        如果只是提问或排障，请改用“使用咨询”或“缺陷反馈”模板。
-        如果这个建议源自实际异常或失败日志，也请一并上传相关日志片段或截图。
+        请尽量精简描述，重点写“你遇到的问题”和“你现在是怎么操作的”。
 
   - type: checkboxes
-    id: confirm
-    attributes:
-      label: 提交前确认
-      options:
-        - label: 我已经搜索过现有 issue，确认这个建议没有被重复提出。
-          required: true
-        - label: 我确认这不是使用问题或环境配置问题。
-          required: true
-
-  - type: dropdown
     id: module
     attributes:
       label: 涉及模块
-      description: 选择最接近的功能范围，工作流会自动补对应模块标签。
+      description: 可多选，工作流会自动补对应标签。
       options:
-        - 标准库
-        - MetaTube
-        - 扫描整理
-        - UI
-        - 其它
-    validations:
-      required: true
+        - label: 标准库
+        - label: 非标准库
+        - label: MetaTube
+        - label: 扫描整理
+        - label: UI
+        - label: 其它
 
   - type: input
     id: version
     attributes:
-      label: 当前版本
-      description: 请写明当前软件版本、便携包名或提交号，便于确认建议对应的实现阶段。
+      label: 软件版本号
+      description: 请填写当前软件版本、便携包名或提交号。
       placeholder: 例如 0.15.1
     validations:
       required: true
 
   - type: textarea
-    id: pain
+    id: problem
     attributes:
-      label: 当前痛点
-      description: 先描述现状为什么不好用，或者当前流程哪里不顺。
-      placeholder: 例如当前只能逐个库手动执行，批量处理路径过长时效率很低。
+      label: 问题 / 建议内容
+      description: 直接写你想解决的问题，或者你希望增加什么能力。
+      placeholder: 例如批量扫描入口太深，希望在库列表页直接触发。
     validations:
       required: true
 
   - type: textarea
-    id: proposal
+    id: steps
     attributes:
-      label: 期望的改动
-      description: 具体说明你想新增或调整什么，以及你预期的效果。
-      placeholder: 例如希望在库列表页增加批量扫描入口，并显示总进度。
+      label: 当前操作方式 / 使用场景
+      description: 说明你现在是怎么操作的，或者这个需求出现在哪个使用场景里。
+      placeholder: 例如现在需要逐个进入库详情页点扫描，连续整理多个库时很慢。
     validations:
       required: true
-
-  - type: textarea
-    id: alternative
-    attributes:
-      label: 备选方案或临时方案
-      description: 如果你已经尝试过其它做法，也可以写在这里。
-      placeholder: 例如目前只能通过脚本批量调用接口，但普通用户难以使用。
-    validations:
-      required: false
-
-  - type: textarea
-    id: more
-    attributes:
-      label: 补充信息
-      description: 可补充草图、示例场景、目标用户、优先级判断依据等。
-    validations:
-      required: false
-
-  - type: textarea
-    id: logs
-    attributes:
-      label: 相关日志或截图
-      description: 如果建议来自实际异常、失败路径或现有行为缺陷，建议附上日志片段或截图。
-      placeholder: 例如某次扫描失败日志、界面提示截图或任务记录片段
-    validations:
-      required: false

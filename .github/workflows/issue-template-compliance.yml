@@ -24,12 +24,13 @@ jobs:
 
             const complianceLabel = "needs:compliance";
             const complianceMarker = "<!-- issue-template-compliance -->";
-            const managedAreaLabels = ["library", "metatube", "scan", "ui"];
+            const managedAreaLabels = ["library", "标准库", "非标准库", "metatube", "scan", "ui"];
             const moduleLabelMap = {
-              "标准库": "library",
-              "MetaTube": "metatube",
-              "扫描整理": "scan",
-              "UI": "ui",
+              "标准库": { name: "标准库", color: "1D76DB", description: "标准番号库相关问题或建议" },
+              "非标准库": { name: "非标准库", color: "5319E7", description: "非标准本地库相关问题或建议" },
+              "MetaTube": { name: "metatube", color: "0052CC", description: "MetaTube 抓取链相关" },
+              "扫描整理": { name: "scan", color: "0E8A16", description: "扫描、整理、导入链路相关" },
+              "UI": { name: "ui", color: "FBCA04", description: "界面、交互、显示相关" },
             };
 
             function escapeRegExp(text) {
@@ -48,6 +49,15 @@ jobs:
                 .replace(/_No response_/gi, "")
                 .replace(/<!--[\s\S]*?-->/g, "")
                 .trim();
+            }
+
+            function extractCheckedOptions(heading) {
+              const section = extractSection(heading);
+              return section
+                .split("\n")
+                .map(line => line.trim())
+                .filter(line => /^- \[x\]\s+/i.test(line))
+                .map(line => line.replace(/^- \[x\]\s+/i, "").trim());
             }
 
             function hasRealContent(text, minLength = 6) {
@@ -117,17 +127,23 @@ jobs:
               return comments.find(comment => comment.body && comment.body.includes(complianceMarker));
             }
 
-            const moduleText = normalize(extractSection("涉及模块"));
-            const targetModuleLabel = moduleLabelMap[moduleText] || null;
+            const selectedModules = extractCheckedOptions("涉及模块");
+            const targetModuleLabels = selectedModules
+              .map(moduleName => moduleLabelMap[moduleName] || null)
+              .filter(Boolean);
 
             for (const areaLabel of managedAreaLabels) {
-              if (areaLabel !== targetModuleLabel && existingLabels.includes(areaLabel)) {
+              const shouldKeep = targetModuleLabels.some(label => label.name === areaLabel);
+              if (!shouldKeep && existingLabels.includes(areaLabel)) {
                 await removeLabel(areaLabel);
               }
             }
 
-            if (targetModuleLabel && !existingLabels.includes(targetModuleLabel)) {
-              await addLabel(targetModuleLabel);
+            for (const moduleLabel of targetModuleLabels) {
+              await ensureLabel(moduleLabel.name, moduleLabel.color, moduleLabel.description);
+              if (!existingLabels.includes(moduleLabel.name)) {
+                await addLabel(moduleLabel.name);
+              }
             }
 
             let issueType = null;
@@ -137,11 +153,11 @@ jobs:
               issueType = "feature";
             } else if (existingLabels.includes("question")) {
               issueType = "question";
-            } else if (body.includes("### 问题描述") && body.includes("### 复现步骤")) {
+            } else if (body.includes("### 日志压缩包或日志内容")) {
               issueType = "bug";
-            } else if (body.includes("### 当前痛点") && body.includes("### 期望的改动")) {
+            } else if (body.includes("### 问题 / 建议内容")) {
               issueType = "feature";
-            } else if (body.includes("### 我想咨询的问题")) {
+            } else if (body.includes("### 当前操作方式 / 已尝试内容")) {
               issueType = "question";
             }
 
@@ -157,52 +173,46 @@ jobs:
             if (!hasRealContent(titleWithoutPrefix, 4)) {
               violations.push("标题过短或只保留了模板前缀，请把主题写具体。");
             }
+            if (selectedModules.length === 0) {
+              violations.push("“涉及模块”至少勾选一项。");
+            }
 
             if (issueType === "bug") {
-              if (!hasRealContent(extractSection("问题描述"), 10)) {
-                violations.push("“问题描述”没有写清楚实际现象。");
+              if (!hasRealContent(extractSection("问题"), 8)) {
+                violations.push("“问题”没有写清楚实际现象。");
               }
-              if (!hasRealContent(extractSection("复现步骤"), 6)) {
-                violations.push("“复现步骤”内容不足，无法据此稳定复现。");
+              if (!hasRealContent(extractSection("操作方式 / 复现方式"), 6)) {
+                violations.push("“操作方式 / 复现方式”内容不足，无法据此稳定复现。");
               }
-              if (!hasRealContent(extractSection("期望结果"), 4)) {
-                violations.push("“期望结果”为空，请说明正常情况下应该发生什么。");
+              if (!hasRealContent(extractSection("软件版本号"), 3)) {
+                violations.push("“软件版本号”为空，请至少提供版本号、便携包名或提交号。");
               }
-              if (!hasRealContent(extractSection("实际结果"), 4)) {
-                violations.push("“实际结果”为空，请说明现在实际发生了什么。");
-              }
-              if (!hasRealContent(extractSection("当前版本"), 3)) {
-                violations.push("“当前版本”为空，请至少提供版本号、便携包名或提交号。");
-              }
-              if (!hasRealContent(extractSection("系统环境"), 3)) {
-                violations.push("“系统环境”为空，请至少提供操作系统与关键运行环境。");
+              if (!hasRealContent(extractSection("日志压缩包或日志内容"), 6)) {
+                violations.push("`BUG` 的“日志压缩包或日志内容”是必填项，请压缩软件根目录下的 `log/` 后上传。");
               }
             }
 
             if (issueType === "feature") {
-              if (!/^\[Feature\]\s+\S+/i.test(title)) {
-                violations.push("功能建议标题请以 `[Feature] ` 开头，并在后面补充简短主题。");
+              if (!hasRealContent(extractSection("问题 / 建议内容"), 8)) {
+                violations.push("“问题 / 建议内容”内容不足，请把建议本身写清楚。");
               }
-              if (!/\- \[x\]/i.test(extractSection("提交前确认"))) {
-                violations.push("“提交前确认”未勾选完成。");
+              if (!hasRealContent(extractSection("当前操作方式 / 使用场景"), 6)) {
+                violations.push("“当前操作方式 / 使用场景”内容不足，请说明你现在是怎么操作的。");
               }
-              if (!hasRealContent(extractSection("当前版本"), 3)) {
-                violations.push("“当前版本”为空，请至少提供版本号、便携包名或提交号。");
-              }
-              if (!hasRealContent(extractSection("当前痛点"), 10)) {
-                violations.push("“当前痛点”内容不足，请先说明现状为什么不好用。");
-              }
-              if (!hasRealContent(extractSection("期望的改动"), 10)) {
-                violations.push("“期望的改动”内容不足，请说清楚想新增或调整什么。");
+              if (!hasRealContent(extractSection("软件版本号"), 3)) {
+                violations.push("“软件版本号”为空，请至少提供版本号、便携包名或提交号。");
               }
             }
 
             if (issueType === "question") {
-              if (!/^\[Question\]\s+\S+/i.test(title)) {
-                violations.push("使用咨询标题请以 `[Question] ` 开头，并在后面补充简短主题。");
+              if (!hasRealContent(extractSection("问题"), 8)) {
+                violations.push("“问题”内容不足，请把咨询内容写完整。");
               }
-              if (!hasRealContent(extractSection("我想咨询的问题"), 8)) {
-                violations.push("“我想咨询的问题”内容不足，请把问题写完整。");
+              if (!hasRealContent(extractSection("当前操作方式 / 已尝试内容"), 6)) {
+                violations.push("“当前操作方式 / 已尝试内容”内容不足，请说明你现在是怎么操作的。");
+              }
+              if (!hasRealContent(extractSection("软件版本号"), 3)) {
+                violations.push("“软件版本号”为空，请至少提供版本号、便携包名或提交号。");
               }
             }
 
