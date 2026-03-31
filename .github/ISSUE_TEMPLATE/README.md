@@ -61,16 +61,6 @@
   - workflow 会自动评论
   - 提醒用户尽量改成更具体的模块
 
-## 修复与关闭规则
-
-- 当前默认不使用额外的 `fix` 标签来表示“已修复”。
-- issue 类型仍以 `bug`、`enhancement` 为主，关闭动作优先交给 GitHub 的 closing keywords 自动完成。
-- 当前双仓推荐写法：
-  - 在 private 仓库的 PR 描述或最终合并提交信息中写：`Fixes spartawhy117/JvedioNext#<issue-number>`
-- 如果修复只在 private 仓库落地、但还没有进入 public 用户可获取的版本：
-  - 先在对应 issue 评论说明当前状态
-  - 不要只因为 private 已修复就机械地立即关闭 public issue
-
 ## 维护建议
 
 - 修改模板字段后，要同步检查 `issue-template-compliance.yml`
