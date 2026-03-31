@@ -41,7 +41,7 @@ jobs:
             }
 
             function extractSection(heading) {
-              const pattern = new RegExp(`###\\s+${escapeRegExp(heading)}\\s*\\n([\\s\\S]*?)(?=\\n###\\s+|$)`, "m");
+              const pattern = new RegExp(`###\\s+${escapeRegExp(heading)}\\s*\\n([\\s\\S]*?)(?=\\n###\\s+|\\s*$)`);
               const match = body.match(pattern);
               return match ? match[1].trim() : "";
             }
