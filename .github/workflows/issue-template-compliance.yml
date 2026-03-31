@@ -26,6 +26,7 @@ jobs:
             const triageLabel = "needs:triage";
             const complianceMarker = "<!-- issue-template-compliance -->";
             const otherModuleMarker = "<!-- issue-other-module-reminder -->";
+            const autoClosedBody = "由于未在 2 小时内补全模板必填信息，这个 issue 已自动关闭。请整理后按中文 Issue 模板重新提交。";
             const managedAreaLabels = ["library", "标准库", "非标准库", "metatube", "scan", "ui", "other"];
             const moduleLabelMap = {
               "标准库": { name: "标准库", color: "1D76DB", description: "标准番号库相关问题或建议" },
@@ -259,6 +260,7 @@ jobs:
             const comments = await getComments();
             const existingComment = comments.find(comment => comment.body && comment.body.includes(complianceMarker));
             const existingOtherModuleComment = comments.find(comment => comment.body && comment.body.includes(otherModuleMarker));
+            const existingAutoClosedComments = comments.filter(comment => comment.body === autoClosedBody);
 
             await ensureLabel(triageLabel, "C2E0C6", "缺少明确模块归类，等待人工分诊");
             if (issueType === "bug" && missingModuleSelection) {
@@ -329,6 +331,14 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 comment_id: existingComment.id,
+              });
+            }
+
+            for (const comment of existingAutoClosedComments) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: comment.id,
               });
             }
 
