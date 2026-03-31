@@ -1,0 +1,335 @@
+name: issue-template-compliance
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate issue template compliance
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const issueNumber = issue.number;
+            const body = issue.body || "";
+            const title = (issue.title || "").trim();
+            const existingLabels = issue.labels.map(label => label.name);
+
+            const complianceLabel = "needs:compliance";
+            const triageLabel = "needs:triage";
+            const complianceMarker = "<!-- issue-template-compliance -->";
+            const otherModuleMarker = "<!-- issue-other-module-reminder -->";
+            const managedAreaLabels = ["library", "标准库", "非标准库", "metatube", "scan", "ui", "other"];
+            const moduleLabelMap = {
+              "标准库": { name: "标准库", color: "1D76DB", description: "标准番号库相关问题或建议" },
+              "非标准库": { name: "非标准库", color: "5319E7", description: "非标准本地库相关问题或建议" },
+              "MetaTube": { name: "metatube", color: "0052CC", description: "MetaTube 抓取链相关" },
+              "扫描整理": { name: "scan", color: "0E8A16", description: "扫描、整理、导入链路相关" },
+              "UI": { name: "ui", color: "FBCA04", description: "界面、交互、显示相关" },
+              "其它": { name: "other", color: "D4C5F9", description: "未归类的其它问题或建议" },
+            };
+
+            function escapeRegExp(text) {
+              return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            }
+
+            function extractSection(heading) {
+              const pattern = new RegExp(`###\\s+${escapeRegExp(heading)}\\s*\\n([\\s\\S]*?)(?=\\n###\\s+|$)`, "m");
+              const match = body.match(pattern);
+              return match ? match[1].trim() : "";
+            }
+
+            function normalize(text) {
+              return (text || "")
+                .replace(/\r/g, "")
+                .replace(/_No response_/gi, "")
+                .replace(/<!--[\s\S]*?-->/g, "")
+                .trim();
+            }
+
+            function extractCheckedOptions(heading) {
+              const section = extractSection(heading);
+              return section
+                .split("\n")
+                .map(line => line.trim())
+                .filter(line => /^- \[x\]\s+/i.test(line))
+                .map(line => line.replace(/^- \[x\]\s+/i, "").trim());
+            }
+
+            function hasRealContent(text, minLength = 6) {
+              const normalized = normalize(text).replace(/\s+/g, " ").trim();
+              if (!normalized) return false;
+              if (normalized.length < minLength) return false;
+              if (!/[\p{L}\p{N}]/u.test(normalized)) return false;
+              const placeholderPatterns = [
+                /^请填写/,
+                /^待补充/,
+                /^暂无$/,
+                /^无$/,
+                /^test$/i,
+              ];
+              return !placeholderPatterns.some(pattern => pattern.test(normalized));
+            }
+
+            function hasAttachmentReference(text) {
+              const normalized = normalize(text);
+              if (!normalized) return false;
+              const attachmentPatterns = [
+                /!\[[^\]]*\]\((https:\/\/github\.com\/user-attachments\/assets\/[^)]+)\)/i,
+                /\[[^\]]+\]\((https:\/\/github\.com\/user-attachments\/files\/[^)]+)\)/i,
+                /https:\/\/github\.com\/user-attachments\/(?:assets|files)\/\S+/i,
+                /upload(ed)?\s+by\s+drag/i,
+              ];
+              return attachmentPatterns.some(pattern => pattern.test(normalized));
+            }
+
+            function isLogsPlaceholderOnly(text) {
+              const normalized = normalize(text).replace(/\s+/g, " ").trim();
+              if (!normalized) return true;
+              const stripped = normalized
+                .replace(/!\[[^\]]*\]\((https:\/\/github\.com\/user-attachments\/assets\/[^)]+)\)/gi, "")
+                .replace(/\[[^\]]+\]\((https:\/\/github\.com\/user-attachments\/files\/[^)]+)\)/gi, "")
+                .replace(/https:\/\/github\.com\/user-attachments\/(?:assets|files)\/\S+/gi, "")
+                .trim();
+              const placeholderPatterns = [
+                /^已上传$/i,
+                /^见附件$/i,
+                /^附件$/i,
+                /^看附件$/i,
+                /^日志已上传$/i,
+                /^log已上传$/i,
+                /^压缩包已上传$/i,
+                /^如附件$/i,
+              ];
+              if (!stripped) return true;
+              return placeholderPatterns.some(pattern => pattern.test(stripped));
+            }
+
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                  color,
+                  description,
+                });
+              }
+            }
+
+            async function addLabel(name) {
+              if (existingLabels.includes(name)) return;
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                labels: [name],
+              });
+            }
+
+            async function removeLabel(name) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  name,
+                });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+              }
+            }
+
+            async function getComplianceComment() {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                per_page: 100,
+              });
+              return comments.find(comment => comment.body && comment.body.includes(complianceMarker));
+            }
+
+            async function getComments() {
+              return github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                per_page: 100,
+              });
+            }
+
+            const selectedModules = extractCheckedOptions("涉及模块");
+            const targetModuleLabels = selectedModules
+              .map(moduleName => moduleLabelMap[moduleName] || null)
+              .filter(Boolean);
+
+            for (const areaLabel of managedAreaLabels) {
+              const shouldKeep = targetModuleLabels.some(label => label.name === areaLabel);
+              if (!shouldKeep && existingLabels.includes(areaLabel)) {
+                await removeLabel(areaLabel);
+              }
+            }
+
+            for (const moduleLabel of targetModuleLabels) {
+              await ensureLabel(moduleLabel.name, moduleLabel.color, moduleLabel.description);
+              if (!existingLabels.includes(moduleLabel.name)) {
+                await addLabel(moduleLabel.name);
+              }
+            }
+
+            let issueType = null;
+            if (existingLabels.includes("bug")) {
+              issueType = "bug";
+            } else if (existingLabels.includes("enhancement")) {
+              issueType = "feature";
+            } else if (body.includes("### 日志压缩包或日志内容")) {
+              issueType = "bug";
+            } else if (body.includes("### 建议内容")) {
+              issueType = "feature";
+            }
+
+            const violations = [];
+            const hasSelectedOther = selectedModules.includes("其它");
+            const missingModuleSelection = selectedModules.length === 0;
+
+            if (!issueType) {
+              violations.push("未使用仓库提供的中文 Issue 模板，请从“缺陷反馈”或“功能建议”入口重新提交。");
+            }
+
+            if (issueType === "bug" && !hasRealContent(title, 4)) {
+              violations.push("标题过短，请把问题主题写具体。");
+            }
+
+            if (missingModuleSelection) {
+              violations.push("“涉及模块”至少勾选一项。");
+            }
+
+            if (issueType === "bug") {
+              if (!hasRealContent(extractSection("问题"), 8)) {
+                violations.push("“问题”没有写清楚实际现象。");
+              }
+              if (!hasRealContent(extractSection("操作方式 / 复现方式"), 6)) {
+                violations.push("“操作方式 / 复现方式”内容不足，无法据此稳定复现。");
+              }
+              if (!hasRealContent(extractSection("软件版本号"), 3)) {
+                violations.push("“软件版本号”为空，请至少提供版本号、便携包名或提交号。");
+              }
+              const logsSection = extractSection("日志压缩包或日志内容");
+              if (!hasRealContent(logsSection, 6)) {
+                violations.push("`BUG` 的“日志压缩包或日志内容”是必填项，请压缩软件根目录下的 `log/` 后上传。");
+              } else {
+                const hasAttachment = hasAttachmentReference(logsSection);
+                const placeholderOnly = isLogsPlaceholderOnly(logsSection);
+                if (!hasAttachment) {
+                  violations.push("`BUG` 日志区需要包含实际附件引用，请把压缩后的 `log/` 拖到输入框中上传。");
+                }
+                if (placeholderOnly) {
+                  violations.push("`BUG` 日志区不能只写“已上传”“见附件”这类占位文字，请补一行日志说明。");
+                }
+              }
+            }
+
+            if (issueType === "feature") {
+              if (!/^\[Feature\]\s+\S+/i.test(title)) {
+                violations.push("功能建议标题请以 `[Feature] ` 开头，并在后面补充简短主题。");
+              }
+              if (!hasRealContent(extractSection("建议内容"), 8)) {
+                violations.push("“建议内容”内容不足，请把你想改什么写清楚。");
+              }
+              if (!hasRealContent(extractSection("使用场景 / 当前操作方式"), 6)) {
+                violations.push("“使用场景 / 当前操作方式”内容不足，请说明建议出现在哪个场景里。");
+              }
+            }
+
+            const comments = await getComments();
+            const existingComment = comments.find(comment => comment.body && comment.body.includes(complianceMarker));
+            const existingOtherModuleComment = comments.find(comment => comment.body && comment.body.includes(otherModuleMarker));
+
+            await ensureLabel(triageLabel, "C2E0C6", "缺少明确模块归类，等待人工分诊");
+            if (issueType === "bug" && missingModuleSelection) {
+              await addLabel(triageLabel);
+            } else if (existingLabels.includes(triageLabel)) {
+              await removeLabel(triageLabel);
+            }
+
+            if (issueType === "feature" && hasSelectedOther) {
+              const otherCommentBody = `${otherModuleMarker}
+            你当前勾选了“其它”模块。
+
+            如果这个建议其实可以归到更具体的模块，例如“标准库 / 非标准库 / MetaTube / 扫描整理 / UI”，建议直接改成更明确的模块，后续处理会更快。`;
+
+              if (!existingOtherModuleComment) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body: otherCommentBody,
+                });
+              }
+            } else if (existingOtherModuleComment) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingOtherModuleComment.id,
+              });
+            }
+
+            if (violations.length > 0) {
+              await ensureLabel(complianceLabel, "B60205", "Issue 模板未通过自动检查");
+              await addLabel(complianceLabel);
+
+              const commentBody = `${complianceMarker}
+            这个 issue 目前没有通过模板检查。
+
+            **需要补充的内容：**
+            ${violations.map(item => `- ${item}`).join("\n")}
+
+            请在 **2 小时** 内编辑当前 issue 完成补充；超时后系统会自动关闭。
+            如果你认为这是误判，可以直接回复说明。`;
+
+              if (existingComment) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existingComment.id,
+                  body: commentBody,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body: commentBody,
+                });
+              }
+
+              core.info(`Issue #${issueNumber} failed compliance: ${violations.join("; ")}`);
+              return;
+            }
+
+            await removeLabel(complianceLabel);
+
+            if (existingComment) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+              });
+            }
+
+            core.info(`Issue #${issueNumber} passed compliance.`);

@@ -1,0 +1,50 @@
+name: 功能建议
+description: 提交新功能或现有行为优化建议
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        这个模板比 `BUG` 反馈更轻量。
+        请至少说明你想改什么，以及它出现在什么模块或使用场景里。
+
+  - type: checkboxes
+    id: module
+    attributes:
+      label: 涉及模块
+      description: 可多选，工作流会自动补对应标签。
+      options:
+        - label: 标准库
+        - label: 非标准库
+        - label: MetaTube
+        - label: 扫描整理
+        - label: UI
+        - label: 其它
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: 建议内容
+      description: 直接写你希望新增、调整或优化什么。
+      placeholder: 例如希望在库列表页增加批量扫描入口。
+    validations:
+      required: true
+
+  - type: textarea
+    id: scene
+    attributes:
+      label: 使用场景 / 当前操作方式
+      description: 简要说明这个建议出现在哪个使用场景里，或你现在是怎么操作的。
+      placeholder: 例如现在需要逐个进入库详情页点扫描，连续整理多个库时很慢。
+    validations:
+      required: true
+
+  - type: textarea
+    id: more
+    attributes:
+      label: 补充说明
+      description: 可选。补充截图、草图、参考方案或其它说明。
+    validations:
+      required: false
