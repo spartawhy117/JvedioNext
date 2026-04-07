@@ -7,11 +7,9 @@
 ### 发布摘要
 
 - 统一内容抓取链日志前缀为 `[Library-Scrape]`，后续排查 MetaTube 请求、抓取计划、降级节流和 sidecar 写入时不再混用历史前缀。
-- 抓取失败但仍缺 `nfo`、海报、缩略图、fanart、演员或演员头像的影片，现在会在下一轮自动重新入队，不再因为历史失败状态被永久跳过。
-- 旧 `NFO` 中的 `metatubeid` 如果已失效，`NormalizeFromRemoteDetailOnly` 命中 `404 / movie not found` 后会自动回退到搜索刷新链，重新生成标准 `NFO` 并继续补抓缺失内容。
-- 影片卡海报 URL 新增基于 sidecar 文件时间戳的 cache bust 参数，抓取或补图后即使 `videoId` 不变也会强制请求新图。
-- 前端在 `library.scrape` 与 `video.generate-posters` 任务完成后会主动失效当前库列表与影片相关查询，减少“文件已写盘但卡片仍显示旧图”的偶发状态。
-- 修复 4K 分辨率下底部 sticky 分页条遮挡最后一行右下角影片卡的问题，列表内容区现在会为分页条预留安全底部空间。
+- 抓取失败但仍缺 `nfo`、海报、缩略图、fanart、演员或演员头像的影片，现在会在下一轮自动重新入队；旧 `NFO` 中失效的 `metatubeid` 命中 `404 / movie not found` 后也会自动回退到搜索刷新链，重新生成标准 `NFO` 并继续补抓缺失内容。
+- 影片卡海报 URL 新增基于 sidecar 文件时间戳的 cache bust 参数，前端在 `library.scrape` 与 `video.generate-posters` 任务完成后也会主动失效当前库列表与影片相关查询，减少“文件已写盘但卡片仍显示旧图”的偶发状态。
+- 修复 4K / 高 DPI 下库列表最后一行因网格空轨道导致的右下角留白问题，影片、合集和演员网格统一改为 `auto-fit`，现有卡片会自动占满最后一行可用空间。
 
 ## [5.9.0]
 
