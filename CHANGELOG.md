@@ -2,6 +2,58 @@
 
 本文件面向仓库首页与 public 分发仓库展示，正式版本记录与 [doc/CHANGELOG.md](./doc/CHANGELOG.md) 保持同步。
 
+## [6.1.0]
+
+### 发布摘要
+
+- MetaTube 抓取主链继续提速，默认请求预算从 `30 req/min` 提升到 `50 req/min`，保留降级档 `20 req/min + 15s` 启动间隔作为服务端异常时的保护回退。
+- 旧库 `missing-only` 抓取现在会优先从可信 `WebType + WebUrl` 提取远端身份直连 detail，并在同一轮任务内按共享 `VID` 复用已解析身份，减少 `search -> detail` 双跳请求。
+- `[Library-Scrape]` 日志补齐抓取瓶颈定位字段，新增 `waitReason / requestStage / actorStage` 等口径，后续可以直接区分卡在请求预算、影片并发、演员并发还是降级串行。
+- 演员详情页、影片库与收藏页的共用网格继续收口到共享分页/列数实现，并补齐纯函数与轻量组件测试，减少高分辨率场景下的列数与末页展示回归风险。
+
+## [6.0.5]
+
+### 发布摘要
+
+- 继续修复 `1080P / 2K / 4K` 全屏下影片库、收藏页和演员页共用网格的宽度利用问题，列数计算从严格 `floor` 调整为“允许小幅收缩后优先争取多一列”，不再轻易在右侧浪费整列空间。
+- 维持“用户卡片密度优先 + 末页不放大”的现有策略，不回退到 `auto-fit + 1fr`；当前页列数一旦确定，会给整页注入统一实际列宽，保证满页和末页卡片宽度一致。
+- active roadmap 与正式 `library-page` 规格已补充高分屏全屏验证口径，明确 `1080P / 2K / 4K` 与常见缩放比例下的回归要求。
+- 新增 `gridPagination` 纯函数覆盖与共享 `VideoGrid` 轻量组件测试，补齐高分屏典型宽度、多一列命中、整行分页，以及页面样式变量接线不丢失等场景。
+
+## [6.0.4]
+
+### 发布摘要
+
+- 修复影片库、收藏页和演员详情页在分页最后一页条目较少时，`video-grid` 使用 `auto-fit + 1fr` 把剩余卡片横向拉宽的问题；现在会按用户当前选择的影片卡宽度固定列数显示，空位直接留白，不再放大卡片。
+- 抓取规划矩阵已正式收口到 `doc/modules/14-scrape-pipeline.md`，明确 `LocalRepair / Repair* / Refresh* / NormalizeFromRemoteDetailOnly / FullScrape` 的命中条件、写回范围和失败回退规则。
+- 标准库扫描与非标准本地库扫描的边界、双仓发布链职责与重发口径已同步补进正式模块文档，后续不再依赖 active plan 承载完整规则正文。
+- 新增抓取规划与旧库补抓自动化覆盖，补齐可信远端身份、本地多缺项修复、失败后图片 URL 回源与无可恢复工作跳过等回归场景。
+
+## [6.0.3]
+
+### 发布摘要
+
+- 影片库、收藏页和演员详情页的卡片分页不再固定写死 `30` 条，改为按当前 `video-grid` 实际列数自动计算动态 `pageSize`，优先按整行倍数铺满页面。
+- 修复 `4K / 高 DPI / 宽窗口` 下因“固定分页大小”和“动态列数”不整除导致的右下角长期空两格、空多格问题，不再继续依赖单纯调整 `auto-fit / auto-fill` 样式碰运气。
+- 新增前端 `gridPagination` 计算与自动化测试覆盖，并在库页补充网格分页诊断日志，后续排查卡片密度、列数和分页换算问题更直接。
+
+## [6.0.2]
+
+### 发布摘要
+
+- 细化 MetaTube 抓取失败状态，新增 `failed-search-no-match`、`failed-remote-timeout`、`failed-remote-rate-limit`、`failed-remote-server` 与 `failed-sidecar-write`，失败后排障和筛选不再只靠笼统的 `failed`。
+- `[Library-Scrape]` 第一阶段日志补齐了 `libraryId / dataId / vid / plan / scrapeStatus / retryReason / sidecarState / failureStatus` 等关键字段，候选规划、远端回退和失败落库链路更容易直接对齐。
+- `publish-public-release.ps1` 新增 public 同版本重发显式开关和发布前预检，默认不再静默覆盖同版本 public release，缺少 `CHANGELOG` 摘要或 ZIP 资产不匹配时会直接中止。
+- 同步补充抓取链与双仓发布正式文档，并为新的失败状态分类和兼容重试规则增加自动化测试覆盖。
+
+## [6.0.1]
+
+### 发布摘要
+
+- 演员详情页头部改为更紧凑的超简识别带，只保留 `头像 / 演员名称 / 影片数`，三者在垂直方向上保持居中对齐，作品区能更早进入首屏。
+- 演员详情页移除弱信息行和独立 `关联影片` 标题，内容区继续复用库页现有的 `QueryToolbar / video-grid / Pagination` 结构，减少页面间割裂感。
+- `doc/UI/new/pages/actor-detail-page.*` 与 `flow/README.md` 已同步更新为新的演员页正式方案，线框、说明文档与实现口径保持一致。
+
 ## [6.0.0]
 
 ### 发布摘要
