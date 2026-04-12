@@ -24,6 +24,18 @@
   </a>
 </p>
 
+---
+
+<!-- repo-report:start -->
+## 开发简报
+
+> 自动更新：2026/04/13 01:39（Asia/Shanghai）
+
+累计：版本发布数 33，已完成 Issue 13，未计划 Issue 1
+
+当周（最近 7 天）：版本发布数 7，已完成 Issue 5，未计划 Issue 1
+<!-- repo-report:end -->
+
 JvedioNext 把"标准番号片库"和"非规则本地资源"统一收进一个可维护的离线媒体库：
 
 - **标准库**：通过 MetaTube 自动补齐海报、NFO、演员与详情，支持扫描整理与元数据抓取
@@ -271,15 +283,3 @@ aaa/
 </table>
 
 </details>
-
----
-
-<!-- repo-report:start -->
-## 开发简报
-
-> 自动更新：2026/04/13 01:39（Asia/Shanghai）
-
-累计：版本发布数 33，已完成 Issue 13，未计划 Issue 1
-
-当周（最近 7 天）：版本发布数 7，已完成 Issue 5，未计划 Issue 1
-<!-- repo-report:end -->
