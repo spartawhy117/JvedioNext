@@ -177,21 +177,9 @@ function buildReport({ releaseCounts, issueCounts }) {
     "",
     `> 自动更新：${generatedAt}（${reportTimeZone}）`,
     "",
-    "### 累计",
+    `累计：版本发布数 ${releaseCounts.total}，已完成 Issue ${issueCounts.totalCompleted}，未计划 Issue ${issueCounts.totalNotPlanned}`,
     "",
-    "| 指标 | 数值 |",
-    "| --- | ---: |",
-    `| 版本发布数 | ${releaseCounts.total} |`,
-    `| 已完成 Issue | ${issueCounts.totalCompleted} |`,
-    `| 未计划 Issue | ${issueCounts.totalNotPlanned} |`,
-    "",
-    `### 当周（最近 ${reportDays} 天）`,
-    "",
-    "| 指标 | 数值 |",
-    "| --- | ---: |",
-    `| 版本发布数 | ${releaseCounts.weekly} |`,
-    `| 已完成 Issue | ${issueCounts.weeklyCompleted} |`,
-    `| 未计划 Issue | ${issueCounts.weeklyNotPlanned} |`,
+    `当周（最近 ${reportDays} 天）：版本发布数 ${releaseCounts.weekly}，已完成 Issue ${issueCounts.weeklyCompleted}，未计划 Issue ${issueCounts.weeklyNotPlanned}`,
   ];
 
   return [startMarker, ...lines, endMarker].join("\n");
