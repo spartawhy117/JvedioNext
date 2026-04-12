@@ -162,7 +162,7 @@ function buildReport({ releaseCounts, issueCounts }) {
     "## 开发简报",
     "",
     `> 自动更新：${generatedAt}（${reportTimeZone}）`,
-    `> 统计口径：版本发布数读取私有仓库 \`${releasesRepository}\` 的非 Draft release；Issue 处理数读取公开仓库 \`${issuesRepository}\` 的已关闭 issue。`,
+    "> 统计口径：版本发布数读取私有发布数据的非 Draft release；Issue 处理数读取公开仓库的已关闭 issue。",
     "",
     "### 累计",
     "",

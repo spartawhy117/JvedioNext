@@ -278,7 +278,7 @@ aaa/
 ## 开发简报
 
 > 自动更新：2026/04/13 01:08（Asia/Shanghai）
-> 统计口径：版本发布数读取私有仓库 `spartawhy117/JvedioNext-private` 的非 Draft release；Issue 处理数读取公开仓库 `spartawhy117/JvedioNext` 的已关闭 issue。
+> 统计口径：版本发布数读取私有发布数据的非 Draft release；Issue 处理数读取公开仓库的已关闭 issue。
 
 ### 累计
 
