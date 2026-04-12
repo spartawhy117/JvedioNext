@@ -111,29 +111,43 @@ async function paginate({ token, path, baseSearchParams = {} }) {
   return results;
 }
 
-async function getClosedIssueCount(repository, token, days) {
+async function getIssueResolutionCounts(repository, token, days) {
   const { owner, repo } = splitRepository(repository);
-  const conditions = [
-    `repo:${owner}/${repo}`,
-    "is:issue",
-    "is:closed",
-  ];
-
-  if (days > 0) {
-    const closedAfter = new Date(subtractDays(days)).toISOString();
-    conditions.push(`closed:>=${closedAfter}`);
-  }
-
-  const result = await requestJson({
+  const issues = await paginate({
     token,
-    path: "search/issues",
-    searchParams: {
-      q: conditions.join(" "),
-      per_page: 1,
+    path: `repos/${owner}/${repo}/issues`,
+    baseSearchParams: {
+      state: "closed",
+      sort: "updated",
+      direction: "desc",
     },
   });
 
-  return result.total_count || 0;
+  const threshold = days > 0 ? subtractDays(days) : null;
+  const filteredIssues = issues.filter(issue => {
+    if (issue.pull_request) {
+      return false;
+    }
+
+    if (!threshold) {
+      return true;
+    }
+
+    return issue.closed_at && new Date(issue.closed_at).getTime() >= threshold;
+  });
+
+  return filteredIssues.reduce(
+    (counts, issue) => {
+      if (issue.state_reason === "completed") {
+        counts.completed += 1;
+      } else if (issue.state_reason === "not_planned") {
+        counts.notPlanned += 1;
+      }
+
+      return counts;
+    },
+    { completed: 0, notPlanned: 0 },
+  );
 }
 
 async function getReleaseCounts(repository, token, days) {
@@ -162,38 +176,41 @@ function buildReport({ releaseCounts, issueCounts }) {
     "## 开发简报",
     "",
     `> 自动更新：${generatedAt}（${reportTimeZone}）`,
-    "> 统计口径：版本发布数读取私有发布数据的非 Draft release；Issue 处理数读取公开仓库的已关闭 issue。",
     "",
     "### 累计",
     "",
     "| 指标 | 数值 |",
     "| --- | ---: |",
     `| 版本发布数 | ${releaseCounts.total} |`,
-    `| Issue 处理数 | ${issueCounts.total} |`,
+    `| 已完成 Issue | ${issueCounts.totalCompleted} |`,
+    `| 未计划 Issue | ${issueCounts.totalNotPlanned} |`,
     "",
     `### 当周（最近 ${reportDays} 天）`,
     "",
     "| 指标 | 数值 |",
     "| --- | ---: |",
     `| 版本发布数 | ${releaseCounts.weekly} |`,
-    `| Issue 处理数 | ${issueCounts.weekly} |`,
+    `| 已完成 Issue | ${issueCounts.weeklyCompleted} |`,
+    `| 未计划 Issue | ${issueCounts.weeklyNotPlanned} |`,
   ];
 
   return [startMarker, ...lines, endMarker].join("\n");
 }
 
 async function main() {
-  const [releaseCounts, totalIssueCount, weeklyIssueCount] = await Promise.all([
+  const [releaseCounts, totalIssueCounts, weeklyIssueCounts] = await Promise.all([
     getReleaseCounts(releasesRepository, releasesToken, reportDays),
-    getClosedIssueCount(issuesRepository, issuesToken, 0),
-    getClosedIssueCount(issuesRepository, issuesToken, reportDays),
+    getIssueResolutionCounts(issuesRepository, issuesToken, 0),
+    getIssueResolutionCounts(issuesRepository, issuesToken, reportDays),
   ]);
 
   const reportBlock = buildReport({
     releaseCounts,
     issueCounts: {
-      total: totalIssueCount,
-      weekly: weeklyIssueCount,
+      totalCompleted: totalIssueCounts.completed,
+      totalNotPlanned: totalIssueCounts.notPlanned,
+      weeklyCompleted: weeklyIssueCounts.completed,
+      weeklyNotPlanned: weeklyIssueCounts.notPlanned,
     },
   });
 
