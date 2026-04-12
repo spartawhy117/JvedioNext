@@ -1,0 +1,60 @@
+name: readme-weekly-report
+
+on:
+  schedule:
+    - cron: "25 1 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+
+concurrency:
+  group: readme-weekly-report
+  cancel-in-progress: false
+
+jobs:
+  update-report:
+    if: github.repository == 'spartawhy117/JvedioNext'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate private report token
+        env:
+          PRIVATE_REPORT_TOKEN: ${{ secrets.PRIVATE_REPORT_TOKEN }}
+        run: |
+          if [ -z "${PRIVATE_REPORT_TOKEN}" ]; then
+            echo "Missing PRIVATE_REPORT_TOKEN secret."
+            exit 1
+          fi
+
+      - name: Update README report block
+        run: node scripts/update-readme-report.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPORT_RELEASES_REPOSITORY: "spartawhy117/JvedioNext-private"
+          REPORT_RELEASES_TOKEN: ${{ secrets.PRIVATE_REPORT_TOKEN }}
+          REPORT_ISSUES_REPOSITORY: ${{ github.repository }}
+          REPORT_ISSUES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPORT_DAYS: "7"
+          REPORT_TIME_ZONE: "Asia/Shanghai"
+
+      - name: Commit README changes
+        run: |
+          if git diff --quiet -- README.md; then
+            echo "README report is already up to date."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "docs: update development summary"
+          git push
