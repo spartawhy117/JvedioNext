@@ -23,7 +23,7 @@
     <img src="https://img.shields.io/github/downloads/spartawhy117/JvedioNext/latest/total.svg?label=latest%20downloads" alt="Latest Release Downloads" />
   </a>
   <a href="https://github.com/spartawhy117/JvedioNext">
-    <img src="https://img.shields.io/github/stars/spartawhy117/JvedioNext?style=social" alt="Stars" />
+    <img src="https://img.shields.io/github/stars/spartawhy117/JvedioNext.svg?style=flat&logo=github" alt="Stars" />
   </a>
 </p>
 
@@ -294,9 +294,9 @@ aaa/
 <!-- repo-report:start -->
 ## 开发简报
 
-> 自动更新：2026/04/22 03:12（Asia/Shanghai）
+> 自动更新：2026/04/13 01:36（Asia/Shanghai）
 
-累计：版本发布数 37，已完成 Issue 17，未计划 Issue 4
+累计：版本发布数 33，已完成 Issue 13，未计划 Issue 1
 
-当周（最近 7 天）：版本发布数 4，已完成 Issue 4，未计划 Issue 3
+当周（最近 7 天）：版本发布数 7，已完成 Issue 5，未计划 Issue 1
 <!-- repo-report:end -->
