@@ -27,8 +27,6 @@
   </a>
 </p>
 
-JvedioNext 是一个面向 **标准番号库**、**非规则本地资源** 和 **标准库 `.strm` 远程索引** 的离线影视管理工具。
-
 - **标准库**：扫描整理番号目录，抓取海报、`NFO`、演员与详情，并支持规范命名的 `.strm`
 - **非标准本地库**：不改原目录结构，通过合集目录列表与动态封面管理散装资源
 - **用户数据**：支持导入导出打包（含封面缓存），迁移无需重新抓取
@@ -44,6 +42,34 @@ JvedioNext 是一个面向 **标准番号库**、**非规则本地资源** 和 *
 
 ---
 
+## 快速查看
+
+### 新用户先看
+
+- [环境准备](#environment)
+- [两种库模式速览](#library-modes-quick)
+- [`.strm` 支持速览](#strm-quick)
+
+### 功能预览
+
+- [预览](#preview)
+- [设置页概览](#settings-overview)
+- [收藏页概览](#favorites-overview)
+- [标签页浏览](#tags-overview)
+
+### 详细规则
+
+- [库模式详细说明](#library-modes-detail)
+
+### 其他
+
+- [致谢](#acknowledgements)
+- [特别声明](#disclaimer)
+- [赞助开发者喝奶茶](#support)
+
+---
+
+<a id="environment"></a>
 ## ⚠️ 首次启动前请先准备环境
 
 默认推荐安装 `x64` 版本；如果你的系统是 `32` 位 Windows，请自行改装对应的 `x86` 版本。
@@ -100,6 +126,7 @@ Worker process exited unexpectedly
 
 ---
 
+<a id="library-modes-quick"></a>
 ## 两种库模式速览
 
 | 模式 | 适合内容 | 元数据抓取 | 是否改原目录 |
@@ -107,6 +134,7 @@ Worker process exited unexpectedly
 | 标准库 | 规范番号影片、规范命名 `.strm` | ✅ MetaTube | ✅ 会整理到标准库结构 |
 | 非标准本地库 | 合集盘、散装目录、非规则资源 | — | ❌ 只同步，不搬运 |
 
+<a id="strm-quick"></a>
 ### `.strm` 支持速览
 
 - 当前 `.strm` 支持只适用于 `MetaTube` 标准库
@@ -116,6 +144,7 @@ Worker process exited unexpectedly
 
 ---
 
+<a id="preview"></a>
 ## 预览
 
 <p align="center">
@@ -135,17 +164,7 @@ Worker process exited unexpectedly
 
 ---
 
-## 架构概览
-
-程序分为两层：
-
-- 前端层：Tauri 桌面壳，负责页面、设置、任务入口、播放器交互与窗口行为
-- Worker 层：.NET 8 后端，负责扫描目录、请求 MetaTube、维护数据库、生成缓存、执行导入导出和后台任务
-
-你实际使用的是桌面页面，但媒体库同步、动态封面生成、元数据抓取和导入导出都由后台任务执行。
-
----
-
+<a id="settings-overview"></a>
 ## 设置页概览
 
 | 分组 | 说明 |
@@ -159,6 +178,7 @@ Worker process exited unexpectedly
 
 ---
 
+<a id="favorites-overview"></a>
 ## 收藏页概览
 
 - 可以把影片、标签和演员统一加入收藏，集中管理常看内容
@@ -168,6 +188,7 @@ Worker process exited unexpectedly
 
 ---
 
+<a id="tags-overview"></a>
 ## 标签页浏览
 
 - 可以按 `类型 / 系列 / 厂商 / 自定义` 浏览标签内容，其中自定义标签同时支持标准库与非标准库
@@ -178,6 +199,7 @@ Worker process exited unexpectedly
 
 ---
 
+<a id="library-modes-detail"></a>
 ## 库模式详细说明
 
 ### 扫描移动 / 保留规则速览
@@ -259,6 +281,18 @@ aaa/
 
 ---
 
+## 架构概览
+
+程序分为两层：
+
+- 前端层：Tauri 桌面壳，负责页面、设置、任务入口、播放器交互与窗口行为
+- Worker 层：.NET 8 后端，负责扫描目录、请求 MetaTube、维护数据库、生成缓存、执行导入导出和后台任务
+
+你实际使用的是桌面页面，但媒体库同步、动态封面生成、元数据抓取和导入导出都由后台任务执行。
+
+---
+
+<a id="acknowledgements"></a>
 ## 致谢
 
 本项目在开发过程中参考了以下优秀开源项目，在此表示感谢：
@@ -269,6 +303,7 @@ aaa/
 
 ---
 
+<a id="disclaimer"></a>
 ## 特别声明
 
 本软件（JvedioNext）**仅用于管理用户个人本地影片**，所有数据处理均在本地离线运行。
@@ -277,6 +312,7 @@ aaa/
 
 ---
 
+<a id="support"></a>
 ## 赞助开发者喝奶茶
 
 <details>
