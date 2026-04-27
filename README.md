@@ -5,7 +5,7 @@
 </h1>
 
 <p align="center">
-  次世代离线影片管理工具，标准番号库与非规则本地资源统一管理
+  次世代离线影片管理工具，标准番号库、非规则本地资源与 `.strm` 远程索引统一管理
 </p>
 
 <p align="center">
@@ -27,51 +27,20 @@
   </a>
 </p>
 
-JvedioNext 把"标准番号片库"和"非规则本地资源"统一收进一个可维护的离线媒体库：
+JvedioNext 是一个面向 **标准番号库**、**非规则本地资源** 和 **标准库 `.strm` 远程索引** 的离线影视管理工具。
 
-- **标准库**：通过 MetaTube 自动补齐海报、NFO、演员与详情，支持扫描整理与元数据抓取
-- **非标准本地库**：不改原目录结构，通过合集目录列表与动态封面，让杂乱本地资源变得可浏览、可迁移
+- **标准库**：扫描整理番号目录，抓取海报、`NFO`、演员与详情，并支持规范命名的 `.strm`
+- **非标准本地库**：不改原目录结构，通过合集目录列表与动态封面管理散装资源
 - **用户数据**：支持导入导出打包（含封面缓存），迁移无需重新抓取
+- **索引辅助**：支持 `VID` 列表导出，便于离线确认影片是否已入库
 
 ---
 
-## 核心特点
+## 适合这些场景
 
-- 🧱 基于 `Tauri 2 + .NET 8 Worker` 的双层桌面架构，界面与任务执行分离。
-- 🎬 标准库支持 MetaTube 抓取，可补齐海报、`NFO`、演员与详情数据。
-- 📁 非标准本地库支持合集目录列表与动态封面，适合管理非规则目录。
-- 📦 用户数据导入导出会打包当前用户目录中的配置、媒体库数据、缓存与工具文件。
-- 🧾 支持 `VID` 索引导出，便于离线确认影片是否已入库。
-
----
-
-## 预览
-
-<p align="center">
-  <img src="./doc/UI/preview/dark.png" alt="影片库暗色预览" width="49%" />
-  <img src="./doc/UI/preview/light.png" alt="影片库亮色预览" width="49%" />
-</p>
-
-<p align="center">
-  <img src="./doc/UI/preview/setting.png" alt="设置页预览" width="49%" />
-  <img src="./doc/UI/preview/actors.png" alt="演员页预览" width="49%" />
-</p>
-
-<p align="center">
-  <img src="./doc/UI/preview/favoritePag.png" alt="收藏页预览" width="49%" />
-  <img src="./doc/UI/preview/tagPage.png" alt="标签页预览" width="49%" />
-</p>
-
----
-
-## 架构概览
-
-程序分为两层：
-
-- 前端层：Tauri 桌面壳，负责页面、设置、任务入口、播放器交互与窗口行为。
-- Worker 层：.NET 8 后端，负责扫描目录、请求 MetaTube、维护数据库、生成缓存、执行导入导出和后台任务。
-
-你真正接触的是前端页面，但媒体库同步、动态封面生成和元数据处理都由 Worker 完成。
+- 你有一套按番号整理或准备整理的标准影片目录，希望自动补齐元数据和 sidecar
+- 你有一批网盘导出的规范 `.strm` 文件，希望继续进入海报墙、详情页和随机选片
+- 你有大量散装本地资源或合集目录，希望不改原目录也能做浏览和管理
 
 ---
 
@@ -131,6 +100,52 @@ Worker process exited unexpectedly
 
 ---
 
+## 两种库模式速览
+
+| 模式 | 适合内容 | 元数据抓取 | 是否改原目录 |
+| --- | --- | --- | --- |
+| 标准库 | 规范番号影片、规范命名 `.strm` | ✅ MetaTube | ✅ 会整理到标准库结构 |
+| 非标准本地库 | 合集盘、散装目录、非规则资源 | — | ❌ 只同步，不搬运 |
+
+### `.strm` 支持速览
+
+- 当前 `.strm` 支持只适用于 `MetaTube` 标准库
+- `JvedioNext` 按 `.strm` 文件名识别影片，文件内容只支持单行绝对 `http/https` 地址
+- 合法 `.strm` 可参与标准库扫描、海报墙、详情页和随机选片；若同名本地实体文件同时存在，则本地实体优先
+- 完整写法与边界说明见 [`doc/modules/22-strm-file-rules.md`](./doc/modules/22-strm-file-rules.md)
+
+---
+
+## 预览
+
+<p align="center">
+  <img src="./doc/UI/preview/dark.png" alt="影片库暗色预览" width="49%" />
+  <img src="./doc/UI/preview/light.png" alt="影片库亮色预览" width="49%" />
+</p>
+
+<p align="center">
+  <img src="./doc/UI/preview/setting.png" alt="设置页预览" width="49%" />
+  <img src="./doc/UI/preview/actors.png" alt="演员页预览" width="49%" />
+</p>
+
+<p align="center">
+  <img src="./doc/UI/preview/favoritePag.png" alt="收藏页预览" width="49%" />
+  <img src="./doc/UI/preview/tagPage.png" alt="标签页预览" width="49%" />
+</p>
+
+---
+
+## 架构概览
+
+程序分为两层：
+
+- 前端层：Tauri 桌面壳，负责页面、设置、任务入口、播放器交互与窗口行为
+- Worker 层：.NET 8 后端，负责扫描目录、请求 MetaTube、维护数据库、生成缓存、执行导入导出和后台任务
+
+你实际使用的是桌面页面，但媒体库同步、动态封面生成、元数据抓取和导入导出都由后台任务执行。
+
+---
+
 ## 设置页概览
 
 | 分组 | 说明 |
@@ -163,12 +178,7 @@ Worker process exited unexpectedly
 
 ---
 
-## 两种库模式
-
-| 模式 | 适合内容 | 元数据抓取 | 合集目录列表 |
-| --- | --- | --- | --- |
-| 标准库 | 标准番号影片库 | ✅ MetaTube | — |
-| 非标准本地库 | 国产合集、散装目录、非规则目录 | — | ✅ |
+## 库模式详细说明
 
 ### 扫描移动 / 保留规则速览
 
@@ -296,9 +306,9 @@ aaa/
 <!-- repo-report:start -->
 ## 开发简报
 
-> 自动更新：2026/04/27 12:46（Asia/Shanghai）
+> 自动更新：2026/04/13 01:36（Asia/Shanghai）
 
-累计：版本发布数 40，已完成 Issue 19，未计划 Issue 5
+累计：版本发布数 33，已完成 Issue 13，未计划 Issue 1
 
-当周（最近 7 天）：版本发布数 4，已完成 Issue 2，未计划 Issue 1
+当周（最近 7 天）：版本发布数 7，已完成 Issue 5，未计划 Issue 1
 <!-- repo-report:end -->
