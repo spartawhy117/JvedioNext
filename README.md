@@ -112,7 +112,7 @@ Worker process exited unexpectedly
 - 当前 `.strm` 支持只适用于 `MetaTube` 标准库
 - `JvedioNext` 按 `.strm` 文件名识别影片，文件内容只支持单行绝对 `http/https` 地址
 - 合法 `.strm` 可参与标准库扫描、海报墙、详情页和随机选片；若同名本地实体文件同时存在，则本地实体优先
-- 完整写法与边界说明见 [`doc/modules/22-strm-file-rules.md`](./doc/modules/22-strm-file-rules.md)
+- 最小写法规则：文件名需按标准番号命名，文件内容建议只保留一个最终播放地址；当前不支持本地路径、相对路径和其他协议内容
 
 ---
 
