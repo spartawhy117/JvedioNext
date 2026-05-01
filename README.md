@@ -54,6 +54,7 @@
 ### 功能预览
 
 - [预览](#preview)
+- [库健康页概览](#library-health-overview)
 - [设置页概览](#settings-overview)
 - [收藏页概览](#favorites-overview)
 - [标签页浏览](#tags-overview)
@@ -162,6 +163,15 @@ Worker process exited unexpectedly
   <img src="./doc/UI/preview/favoritePag.png" alt="收藏页预览" width="49%" />
   <img src="./doc/UI/preview/tagPage.png" alt="标签页预览" width="49%" />
 </p>
+
+---
+
+<a id="library-health-overview"></a>
+## 库健康页概览
+
+- 入口：可从媒体库管理页的 `查看健康`，或单库页工具栏中的 `库健康` 进入。
+- 页面内容：集中展示当前库的抓取状态、资源缺口、规则问题、失效记录和分组一致性；本地库会保留更贴近本地资源场景的三张诊断卡。
+- 主要按钮：支持 `一键重抓并补资源`、`重新检查失效记录`、`查看文件规则问题`，并可在页面顶部直接 `刷新健康状态`。
 
 ---
 
