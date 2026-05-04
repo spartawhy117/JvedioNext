@@ -239,7 +239,7 @@ Worker process exited unexpectedly
 适合按番号管理的影片目录。推荐操作顺序：先 `扫描` 确认入库正确，再 `抓取元数据` 补齐详情。
 
 - 支持用户配置多条扫描目录；扫描负责识别影片并入库，抓取负责补齐海报、`NFO`、演员与详情页
-- 标准库现已支持规范命名的 `.strm` 文件；用户写法规则见 [`doc/modules/22-strm-file-rules.md`](./doc/modules/22-strm-file-rules.md)
+- 标准库现已支持规范命名的 `.strm` 文件；最小写法规则见上方 [`.strm 支持速览`](#strm-quick)
 - 子集识别、目录整理、sidecar 放置和卡片显示规则以上表为准
 - 新版本扫描阶段**不会自动删除用户磁盘上的原影片文件**
 - 抓取后的 `NFO` 与三张主图会写回影片所在的基准 `VID` 目录
@@ -331,20 +331,9 @@ aaa/
 
 如果这个项目帮你省下了一些整理和排错时间，欢迎扫码支持开发者继续维护。
 
-<table>
-  <tr>
-    <th>微信支付</th>
-    <th>支付宝</th>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="./doc/UI/preview/wechatpay.png" alt="微信支付收款码" width="280" />
-    </td>
-    <td align="center">
-      <img src="./doc/UI/preview/alipay.jpg" alt="支付宝收款码" width="280" />
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <img src="./doc/UI/preview/wechatpay.png" alt="微信支付收款码" width="280" />
+</p>
 
 </details>
 
@@ -353,9 +342,9 @@ aaa/
 <!-- repo-report:start -->
 ## 开发简报
 
-> 自动更新：2026/05/04 12:55（Asia/Shanghai）
+> 自动更新：2026/04/13 01:36（Asia/Shanghai）
 
-累计：版本发布数 46，已完成 Issue 27，未计划 Issue 6
+累计：版本发布数 33，已完成 Issue 13，未计划 Issue 1
 
-当周（最近 7 天）：版本发布数 6，已完成 Issue 8，未计划 Issue 1
+当周（最近 7 天）：版本发布数 7，已完成 Issue 5，未计划 Issue 1
 <!-- repo-report:end -->
