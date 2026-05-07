@@ -6,8 +6,6 @@
 - 哪些后缀当前有效
 - 哪些命名当前不支持或不进入主链
 
-内部完整设计仍以 [doc/modules/24-standard-library-vid-identification-rules.md](./doc/modules/24-standard-library-vid-identification-rules.md) 为准。
-
 ## 1. 支持的命名家族
 
 | 家族 | 当前支持 | 示例 | 备注 |
@@ -116,10 +114,3 @@ https://example.com/video/ABC-123.mp4
 - `10MUSUME-050426_01.mp4`
 - `PACOPACOMAMA-050426_100.mp4`
 - `HEYZO-3816.mp4`
-
-## 6. 相关文档
-
-- `.strm` 文件内容规则：
-  - [doc/modules/22-strm-file-rules.md](./doc/modules/22-strm-file-rules.md)
-- 内部完整版命名规则：
-  - [doc/modules/24-standard-library-vid-identification-rules.md](./doc/modules/24-standard-library-vid-identification-rules.md)
