@@ -11,6 +11,8 @@
 <p align="center">
   <a href="./CHANGELOG.md">版本更新记录</a>
   ·
+  <a href="./standard-library-naming-rules.md">标准库命名规则</a>
+  ·
   <a href="https://github.com/spartawhy117/JvedioNext/releases/latest">最新版本下载</a>
 </p>
 
@@ -47,9 +49,9 @@
 
 ### 新用户先看
 
+- [标准库命名规则](./standard-library-naming-rules.md)
 - [环境准备](#environment)
 - [两种库模式速览](#library-modes-quick)
-- [`.strm` 支持速览](#strm-quick)
 
 ### 功能预览
 
@@ -59,15 +61,20 @@
 - [收藏页概览](#favorites-overview)
 - [标签页浏览](#tags-overview)
 
-### 详细规则
-
-- [库模式详细说明](#library-modes-detail)
-
 ### 其他
 
 - [致谢](#acknowledgements)
 - [特别声明](#disclaimer)
 - [赞助开发者喝奶茶](#support)
+
+---
+
+## 标准库命名规则摘要
+
+- 标准库当前支持：有码标准番号、`FC2-PPV`、部分有码素人前缀、部分带厂商信号的无码番号
+- 裸日期号无码当前不会自动进入标准库抓取主链
+- `.strm` 也必须遵循标准库命名规则，且文件内容只支持单行绝对 `http/https` 地址
+- 详细支持范围、后缀规则和不支持情况见：[标准库命名规则](./standard-library-naming-rules.md)
 
 ---
 
@@ -139,10 +146,9 @@ Worker process exited unexpectedly
 <a id="strm-quick"></a>
 ### `.strm` 支持速览
 
-- 当前 `.strm` 支持只适用于 `MetaTube` 标准库
-- `JvedioNext` 按 `.strm` 文件名识别影片，文件内容只支持单行绝对 `http/https` 地址
-- 合法 `.strm` 可参与标准库扫描、海报墙、详情页和随机选片；若同名本地实体文件同时存在，则本地实体优先
-- 最小写法规则：文件名需按标准番号命名，文件内容建议只保留一个最终播放地址；当前不支持本地路径、相对路径和其他协议内容
+- 当前 `.strm` 支持只适用于 `MetaTube` 标准库。
+- 文件名需要遵循标准库命名，文件内容只支持单行绝对 `http/https` 地址。
+- 详细写法与命名边界见：[标准库命名规则](./standard-library-naming-rules.md)
 
 ---
 
@@ -222,25 +228,12 @@ Worker process exited unexpectedly
   - `刷新目录` 只做同步，不移动、不重命名、不按 `VID` 整理原文件
   - 默认保留原目录、原文件和原命名，扫描阶段不做自动搬运
 
-### 标准库子集 / 资源 / 显示规则速览
-
-| 维度 | 当前规则 |
-| --- | --- |
-| 子集命名识别 | 当前会识别常见电影子集命名，例如 `ABC-123-1`、`ABC-123_2`、`ABC-123 CD1`、`ABC-123 PART2`、`ABC-123 FHD1`、`ABC-123A/B/C` |
-| 非子集排除 | `ABC-123-C`、`ABC-123-CH` 这类中文字幕后缀不会当成子集；它们会继续作为独立影片文件存在 |
-| 目录整理 | 标准库扫描后，同一影片的合法子集会收进同一个基准 `VID` 目录；非标准本地库不改原目录 |
-| sidecar 放置 | `NFO`、`poster`、`thumb`、`fanart` 统一按基准 `VID` 写在该目录中，例如 `ABC-123.nfo`、`ABC-123-poster.jpg` |
-| 列表显示 | 合法多子集在列表页聚合成 `1` 张主卡，卡面左上角显示 `N Parts` |
-| 详情播放 | 多子集影片进入详情页后，通过独立的 `Part X` 子集条选择具体播放文件；单文件影片保持原播放方式 |
-| 独立卡片保留 | `-C/-CH`、未命中子集规则的同 `VID` 文件、不同来源同 `VID` 文件，不会强行并成一张卡 |
-
 ### 🎬 标准库（MetaTube 数据源）
 
 适合按番号管理的影片目录。推荐操作顺序：先 `扫描` 确认入库正确，再 `抓取元数据` 补齐详情。
 
 - 支持用户配置多条扫描目录；扫描负责识别影片并入库，抓取负责补齐海报、`NFO`、演员与详情页
-- 标准库现已支持规范命名的 `.strm` 文件；最小写法规则见上方 [`.strm 支持速览`](#strm-quick)
-- 子集识别、目录整理、sidecar 放置和卡片显示规则以上表为准
+- 标准库现已支持规范命名的 `.strm` 文件；命名和后缀规则见：[标准库命名规则](./standard-library-naming-rules.md)
 - 新版本扫描阶段**不会自动删除用户磁盘上的原影片文件**
 - 抓取后的 `NFO` 与三张主图会写回影片所在的基准 `VID` 目录
 
