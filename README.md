@@ -335,9 +335,9 @@ aaa/
 <!-- repo-report:start -->
 ## 开发简报
 
-> 自动更新：2026/04/13 01:36（Asia/Shanghai）
+> 自动更新：2026/05/08 03:41（Asia/Shanghai）
 
-累计：版本发布数 33，已完成 Issue 13，未计划 Issue 1
+累计：版本发布数 47，已完成 Issue 29，未计划 Issue 6
 
-当周（最近 7 天）：版本发布数 7，已完成 Issue 5，未计划 Issue 1
+当周（最近 7 天）：版本发布数 5，已完成 Issue 7，未计划 Issue 0
 <!-- repo-report:end -->
