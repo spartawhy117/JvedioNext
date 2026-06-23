@@ -59,6 +59,7 @@
 - [库健康页概览](#library-health-overview)
 - [设置页概览](#settings-overview)
 - [收藏页概览](#favorites-overview)
+- [搜索页概览](#search-overview)
 - [标签页浏览](#tags-overview)
 
 ### 其他
@@ -172,6 +173,10 @@ Worker process exited unexpectedly
   <img src="./doc/UI/preview/tagPage.png" alt="标签页预览" width="49%" />
 </p>
 
+<p align="center">
+  <img src="./doc/UI/preview/searchPage.png" alt="搜索页预览" width="49%" />
+</p>
+
 ---
 
 <a id="library-health-overview"></a>
@@ -204,6 +209,17 @@ Worker process exited unexpectedly
 - 收藏首页会直接显示 `影片 / 标签 / 演员` 三类入口，方便按对象快速进入对应列表
 - 收藏影片页支持搜索、排序、批量取消收藏和批量处理，适合整理常看片单
 - 收藏标签页与收藏演员页支持查看收藏对象、快速取消收藏，并可继续按收藏对象回看关联影片
+
+---
+
+<a id="search-overview"></a>
+## 搜索页概览
+
+- 可以按单个 `VID`、单个演员原词和单个 `Tag` 原词搜索远端影片，并直接查看标准库是否已存在
+- 支持把远端结果映射为 `标准库已存在 / 本地库已存在 / 已收藏 / 未入库` 四类本地状态，方便快速判断是否需要继续入库
+- 结果卡支持直接查看远端详情、打开本地影片、补抓已有影片和打开来源页，搜索后的后续处理链路更完整
+- 可以从左侧导航直接进入搜索页，也可以从演员页、收藏演员页、标签页、收藏标签页和影片详情页通过右键 `搜索相关影片` 进入
+- 当前演员和 `Tag` 搜索优先建议使用日文原词或站点原词，方便更稳定命中结果
 
 ---
 
@@ -337,9 +353,9 @@ aaa/
 <!-- repo-report:start -->
 ## 开发简报
 
-> 自动更新：2026/06/22 14:44（Asia/Shanghai）
+> 自动更新：2026/04/13 01:36（Asia/Shanghai）
 
-累计：版本发布数 53，已完成 Issue 32，未计划 Issue 7
+累计：版本发布数 33，已完成 Issue 13，未计划 Issue 1
 
-当周（最近 7 天）：版本发布数 1，已完成 Issue 1，未计划 Issue 1
+当周（最近 7 天）：版本发布数 7，已完成 Issue 5，未计划 Issue 1
 <!-- repo-report:end -->
