@@ -29,13 +29,15 @@
   </a>
 </p>
 
+当资源越来越多以后，`JvedioNext` 重点解决的是：怎么找、怎么补、怎么整理、怎么迁移。
+
 - **标准库**：扫描整理番号目录，抓取海报、`NFO`、演员与详情，并支持规范命名的 `.strm`
 - **非标准本地库**：不改原目录结构，通过合集目录列表与动态封面管理散装资源
-- **搜索页**：按单个 `VID`、演员原词和单个 `Tag` 原词搜索远端影片，并显示本地入库状态
+- **搜索页**：按 `VID`、演员原词和 `Tag` 原词搜索远端影片，并显示标准库已存在、本地库已存在、已收藏或未入库，方便按演员或标签查漏补库
 - **演员页**：补全演员扩展信息，并按年龄、身高和罩杯筛选
 - **标签页 / 收藏页**：统一浏览、收藏和回看影片、标签与演员
 - **库健康**：集中查看抓取状态、资源缺口、规则问题、失效记录和分组一致性
-- **用户数据**：支持导入导出打包，迁移时可保留封面缓存
+- **用户数据**：支持导入导出打包，保留媒体库、影片资料、演员资料、标签与收藏关系、封面缓存和主要配置
 
 ---
 
@@ -44,6 +46,12 @@
 - 你有一套按番号整理或准备整理的标准影片目录，希望自动补齐元数据和 sidecar
 - 你有一批网盘导出的规范 `.strm` 文件，希望继续进入海报墙、详情页和随机选片
 - 你有大量散装本地资源或合集目录，希望不改原目录也能浏览和管理
+
+---
+
+## 和通用媒体库的区别
+
+Jellyfin 这类工具更适合做家庭媒体服务器和播放入口；`JvedioNext` 更偏向本地影片库的整理和维护：扫描、抓取、补资料、查缺口、维护演员和标签、迁移自己的库。
 
 ---
 
@@ -56,17 +64,17 @@
 </p>
 
 <p align="center">
-  <img src="./doc/UI/preview/setting.png" alt="设置页预览" width="49%" />
+  <img src="./doc/UI/preview/searchPage.png" alt="搜索页预览" width="49%" />
   <img src="./doc/UI/preview/actors.png" alt="演员页预览" width="49%" />
 </p>
 
 <p align="center">
-  <img src="./doc/UI/preview/favoritePag.png" alt="收藏页预览" width="49%" />
   <img src="./doc/UI/preview/tagPage.png" alt="标签页预览" width="49%" />
+  <img src="./doc/UI/preview/favoritePag.png" alt="收藏页预览" width="49%" />
 </p>
 
 <p align="center">
-  <img src="./doc/UI/preview/searchPage.png" alt="搜索页预览" width="49%" />
+  <img src="./doc/UI/preview/setting.png" alt="设置页预览" width="49%" />
   <img src="./doc/UI/preview/setting2.png" alt="设置诊断页预览" width="49%" />
 </p>
 
