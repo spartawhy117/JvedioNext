@@ -67,6 +67,7 @@
 
 <p align="center">
   <img src="./doc/UI/preview/searchPage.png" alt="搜索页预览" width="49%" />
+  <img src="./doc/UI/preview/setting2.png" alt="设置诊断页预览" width="49%" />
 </p>
 
 ---
