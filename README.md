@@ -47,6 +47,30 @@
 
 ---
 
+<a id="preview"></a>
+## 预览
+
+<p align="center">
+  <img src="./doc/UI/preview/dark.png" alt="影片库暗色预览" width="49%" />
+  <img src="./doc/UI/preview/light.png" alt="影片库亮色预览" width="49%" />
+</p>
+
+<p align="center">
+  <img src="./doc/UI/preview/setting.png" alt="设置页预览" width="49%" />
+  <img src="./doc/UI/preview/actors.png" alt="演员页预览" width="49%" />
+</p>
+
+<p align="center">
+  <img src="./doc/UI/preview/favoritePag.png" alt="收藏页预览" width="49%" />
+  <img src="./doc/UI/preview/tagPage.png" alt="标签页预览" width="49%" />
+</p>
+
+<p align="center">
+  <img src="./doc/UI/preview/searchPage.png" alt="搜索页预览" width="49%" />
+</p>
+
+---
+
 ## 快速查看
 
 ### 新用户先看
@@ -137,32 +161,6 @@ Worker process exited unexpectedly
 - 当前 `.strm` 支持只适用于 `MetaTube` 标准库
 - 文件名需要遵循标准库命名，文件内容只支持单行绝对 `http/https` 地址
 - 详细写法与命名边界见：[标准库命名规则](./standard-library-naming-rules.md)
-
----
-
-<a id="preview"></a>
-## 预览
-
-<p align="center">
-  <img src="./doc/UI/preview/dark.png" alt="影片库暗色预览" width="49%" />
-  <img src="./doc/UI/preview/light.png" alt="影片库亮色预览" width="49%" />
-</p>
-
-<p align="center">
-  <img src="./doc/UI/preview/setting.png" alt="设置页预览" width="49%" />
-  <img src="./doc/UI/preview/actors.png" alt="演员页预览" width="49%" />
-</p>
-
-<p align="center">
-  <img src="./doc/UI/preview/favoritePag.png" alt="收藏页预览" width="49%" />
-  <img src="./doc/UI/preview/tagPage.png" alt="标签页预览" width="49%" />
-</p>
-
-<p align="center">
-  <img src="./doc/UI/preview/searchPage.png" alt="搜索页预览" width="49%" />
-</p>
-
----
 
 <a id="core-overview"></a>
 ## 核心页面概览
