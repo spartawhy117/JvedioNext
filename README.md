@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://github.com/spartawhy117/JvedioNext/releases/latest">最新版本下载</a>
   ·
-  <a href="./doc/wiki/software-user-guide.md">用户功能 Wiki</a>
+  <a href="./doc/wiki/software-user-guide.md">使用指南</a>
   ·
   <a href="./standard-library-naming-rules.md">标准库命名规则</a>
   ·
@@ -34,7 +34,7 @@
 当资源越来越多以后，`JvedioNext` 重点解决的是：怎么找、怎么补、怎么整理、怎么迁移。
 
 - **标准库**：扫描整理番号目录，抓取海报、`NFO`、演员与详情，并支持规范命名的 `.strm`
-- **非标准本地库**：不改原目录结构，通过合集目录列表与动态封面管理散装资源
+- **非标准本地库**：面向论坛或社区下载的国产、OF 等非标准 JAV 电影数据，保留原目录结构，按自己的分类、合集和自定义标签管理
 - **搜索页**：按 `VID`、演员原词和 `Tag` 原词搜索远端影片，并显示标准库已存在、本地库已存在、已收藏或未入库，方便按演员或标签查漏补库
 - **演员页**：补全演员扩展信息，并按年龄、身高和罩杯筛选
 - **标签页 / 收藏页**：统一浏览、收藏和回看影片、标签与演员
@@ -47,7 +47,7 @@
 
 - 你有一套按番号整理或准备整理的标准影片目录，希望自动补齐元数据和 sidecar
 - 你有一批网盘导出的规范 `.strm` 文件，希望继续进入海报墙、详情页和随机选片
-- 你有大量散装本地资源或合集目录，希望不改原目录也能浏览和管理
+- 你有从论坛或社区下载的国产、OF 等非标准 JAV 数据，希望不改原目录，按自己的分类、合集和标签管理
 
 ---
 
@@ -88,14 +88,14 @@ Jellyfin 这类工具更适合做家庭媒体服务器和播放入口；`JvedioN
 
 - [最新版本下载](https://github.com/spartawhy117/JvedioNext/releases/latest)
 - [首次启动前请先准备环境](#environment)
-- [用户功能 Wiki](./doc/wiki/software-user-guide.md)
+- [使用指南](./doc/wiki/software-user-guide.md)
 - [两种库模式速览](#library-modes-quick)
 - [标准库命名规则](./standard-library-naming-rules.md)
 
 ### 功能预览
 
 - [预览图](#preview)
-- [完整功能 Wiki](./doc/wiki/software-user-guide.md)
+- [完整使用指南](./doc/wiki/software-user-guide.md)
 - [核心页面概览](#core-overview)
 - [库模式说明](#library-modes-detail)
 
@@ -167,7 +167,7 @@ Worker process exited unexpectedly
 | 模式 | 适合内容 | 元数据抓取 | 是否整理目录 | 是否删除原片 |
 | --- | --- | --- | --- | --- |
 | 标准库 | 规范番号影片、规范命名 `.strm` | 需要 `MetaTube` | 会整理到标准库结构 | 扫描阶段不自动删除 |
-| 非标准本地库 | 合集盘、散装目录、非规则资源 | 不需要 | 只同步，不搬运 | 不删除原目录和原文件 |
+| 非标准本地库 | 论坛或社区下载的国产、OF 等非标准 JAV 数据 | 不需要 | 只同步，不搬运 | 不删除原目录和原文件 |
 
 ### `.strm` 支持速览
 
@@ -238,7 +238,7 @@ Worker process exited unexpectedly
 
 ### 非标准本地库
 
-适合合集盘、散装目录等非规则本地资源。推荐先 `刷新目录` 确认展示正确，再按需 `生成动态封面`。
+适合从论坛或社区下载的国产、OF 等非标准 JAV 电影数据。这类资源通常没有稳定番号、没有可直接搜刮的标准元数据，更适合保留原目录结构，并按自己的分类、合集和自定义标签进行管理。推荐先 `刷新目录` 确认展示正确，再按需 `生成动态封面`。
 
 - 配置 1 条扫描目录，刷新目录只同步文件变化，不移动、不重命名、不按 `VID` 整理原文件
 - 可选填“合集目录列表”，将指定路径显示为合集入口；未命中的影片默认平铺
