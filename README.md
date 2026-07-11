@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://github.com/spartawhy117/JvedioNext/releases/latest">最新版本下载</a>
   ·
-  <a href="./doc/wiki/software-user-guide.md">使用指南</a>
+  <a href="https://github.com/spartawhy117/JvedioNext/wiki/User-Guide">使用指南</a>
   ·
   <a href="./standard-library-naming-rules.md">标准库命名规则</a>
   ·
@@ -88,14 +88,14 @@ Jellyfin 这类工具更适合做家庭媒体服务器和播放入口；`JvedioN
 
 - [最新版本下载](https://github.com/spartawhy117/JvedioNext/releases/latest)
 - [首次启动前请先准备环境](#environment)
-- [使用指南](./doc/wiki/software-user-guide.md)
+- [使用指南](https://github.com/spartawhy117/JvedioNext/wiki/User-Guide)
 - [两种库模式速览](#library-modes-quick)
 - [标准库命名规则](./standard-library-naming-rules.md)
 
 ### 功能预览
 
 - [预览图](#preview)
-- [完整使用指南](./doc/wiki/software-user-guide.md)
+- [完整使用指南](https://github.com/spartawhy117/JvedioNext/wiki/User-Guide)
 - [核心页面概览](#core-overview)
 - [库模式说明](#library-modes-detail)
 
