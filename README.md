@@ -11,6 +11,8 @@
 <p align="center">
   <a href="https://github.com/spartawhy117/JvedioNext/releases/latest">最新版本下载</a>
   ·
+  <a href="./doc/wiki/software-user-guide.md">用户功能 Wiki</a>
+  ·
   <a href="./standard-library-naming-rules.md">标准库命名规则</a>
   ·
   <a href="./CHANGELOG.md">版本更新记录</a>
@@ -86,12 +88,14 @@ Jellyfin 这类工具更适合做家庭媒体服务器和播放入口；`JvedioN
 
 - [最新版本下载](https://github.com/spartawhy117/JvedioNext/releases/latest)
 - [首次启动前请先准备环境](#environment)
+- [用户功能 Wiki](./doc/wiki/software-user-guide.md)
 - [两种库模式速览](#library-modes-quick)
 - [标准库命名规则](./standard-library-naming-rules.md)
 
 ### 功能预览
 
 - [预览图](#preview)
+- [完整功能 Wiki](./doc/wiki/software-user-guide.md)
 - [核心页面概览](#core-overview)
 - [库模式说明](#library-modes-detail)
 
@@ -292,9 +296,9 @@ Worker process exited unexpectedly
 <!-- repo-report:start -->
 ## 开发简报
 
-> 自动更新：2026/07/12 04:08（Asia/Shanghai）
+> 自动更新：2026/04/13 01:36（Asia/Shanghai）
 
-累计：版本发布数 57，已完成 Issue 42，未计划 Issue 7
+累计：版本发布数 33，已完成 Issue 13，未计划 Issue 1
 
-当周（最近 7 天）：版本发布数 3，已完成 Issue 9，未计划 Issue 0
+当周（最近 7 天）：版本发布数 7，已完成 Issue 5，未计划 Issue 1
 <!-- repo-report:end -->
