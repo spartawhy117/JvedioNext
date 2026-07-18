@@ -111,7 +111,7 @@ Jellyfin 这类工具更适合做家庭媒体服务器和播放入口；`JvedioN
 ## 标准库命名规则摘要
 
 - 支持：常见标准番号、`FC2-PPV`、已确认的数字前缀素人番号、带明确厂商或来源信号的无码番号
-- Caribbeancom：支持 `CARIBBEANCOM-YYMMDD-NNN` 横线日期号；显式 Caribbeancom 前缀配下划线日期号会提示厂商格式冲突
+- Caribbeancom：支持 `CARIBBEANCOM-MMDDYY-NNN` 横线日期号；显式 Caribbeancom 前缀配下划线日期号会提示厂商格式冲突
 - 需要补充信号：无码样本必须能从文件名识别厂商、来源或已登记系列号，才会进入标准库抓取主链
 - 不支持自动入库：裸日期号无码不会直接作为标准库 `VID` 抓取
 - `.strm` 也必须遵循标准库命名规则，且文件内容只支持单行绝对 `http/https` 地址

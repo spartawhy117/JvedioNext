@@ -39,7 +39,7 @@
 
 - 有码、`FC2-PPV`、`TMA` 混合前缀、数字前缀素人番号、明确厂商标识的无码样本，当前都可以按规则入标准库。
 - 裸日期号无码当前不直接进主链。
-- `Caribbeancom` 只接受 `CARIBBEANCOM-YYMMDD-NNN` 横线日期号；`Caribbeancompr` 当前只保留识别，不自动入库。
+- `Caribbeancom` 只接受 `CARIBBEANCOM-MMDDYY-NNN` 横线日期号；`Caribbeancompr` 当前只保留识别，不自动入库。
 
 ## 2. 后缀识别规则
 
