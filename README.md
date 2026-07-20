@@ -297,9 +297,9 @@ Worker process exited unexpectedly
 <!-- repo-report:start -->
 ## 开发简报
 
-> 自动更新：2026/04/13 01:36（Asia/Shanghai）
+> 自动更新：2026/07/20 13:00（Asia/Shanghai）
 
-累计：版本发布数 33，已完成 Issue 13，未计划 Issue 1
+累计：版本发布数 59，已完成 Issue 52，未计划 Issue 10
 
-当周（最近 7 天）：版本发布数 7，已完成 Issue 5，未计划 Issue 1
+当周（最近 7 天）：版本发布数 2，已完成 Issue 7，未计划 Issue 2
 <!-- repo-report:end -->
