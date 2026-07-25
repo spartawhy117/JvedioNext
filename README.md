@@ -35,6 +35,7 @@
 
 - **标准库**：扫描整理番号目录，抓取海报、`NFO`、演员与详情，并支持规范命名的 `.strm`
 - **非标准本地库**：面向论坛或社区下载的国产、OF 等非标准 JAV 电影数据，保留原目录结构，按自己的分类、合集和自定义标签管理
+- **第三方已整理目录**：读取 MDCX、Emby 等工具已有的 `NFO`、本地海报和演员关联，不改写原目录
 - **搜索页**：按 `VID`、演员原词和 `Tag` 原词搜索远端影片，并显示标准库已存在、本地库已存在、已收藏或未入库，方便按演员或标签查漏补库
 - **演员页**：补全演员扩展信息，并按年龄、身高和罩杯筛选
 - **标签页 / 收藏页**：统一浏览、收藏和回看影片、标签与演员
@@ -90,6 +91,7 @@ Jellyfin 这类工具更适合做家庭媒体服务器和播放入口；`JvedioN
 - [首次启动前请先准备环境](#environment)
 - [使用指南](https://github.com/spartawhy117/JvedioNext/wiki/User-Guide)
 - [两种库模式速览](#library-modes-quick)
+- [第三方抓取目录兼容说明](./doc/wiki/third-party-scraped-library-compatibility.md)
 - [标准库命名规则](./standard-library-naming-rules.md)
 
 ### 功能预览
@@ -163,12 +165,13 @@ Worker process exited unexpectedly
 ---
 
 <a id="library-modes-quick"></a>
-## 两种库模式速览
+## 媒体库与目录源速览
 
 | 模式 | 适合内容 | 元数据抓取 | 是否整理目录 | 是否删除原片 |
 | --- | --- | --- | --- | --- |
 | 标准库 | 规范番号影片、规范命名 `.strm` | 需要 `MetaTube` | 会整理到标准库结构 | 扫描阶段不自动删除 |
 | 非标准本地库 | 论坛或社区下载的国产、OF 等非标准 JAV 数据 | 不需要 | 只同步，不搬运 | 不删除原目录和原文件 |
+| 第三方抓取目录 | 已由 MDCX、Emby 等工具整理，并含 NFO 或本地图片的影片 | 先读本地 NFO；可按需补空字段 | 不整理，不写入 | 不删除原目录和原文件 |
 
 ### `.strm` 支持速览
 
@@ -247,6 +250,15 @@ Worker process exited unexpectedly
 - 动态封面由 `FFmpeg` 生成，静态封面和悬停预览缓存到软件数据目录，不改动原影片目录
 - `编辑` 可修改库名、扫描目录和合集规则；`移除库` 只清理软件内数据和缓存，不删除原影片
 
+### 第三方已整理目录
+
+适合已经由 MDCX、Emby 等工具抓取完成的目录。新建或编辑媒体库时，将对应扫描目录设为 `第三方抓取`，再点击 `扫描` 导入 NFO、已有本地图片和演员关联。
+
+- `扫描` 只在首次接入或 NFO 变化后同步信息，不会移动、改名、删除文件，也不会改写 NFO 或图片
+- `抓取元数据` 是可选补全动作，只为身份明确的影片补充 NFO 缺失的资料
+- 第三方工具新增影片或修改 NFO 后，需要再次点击 `扫描`；浏览、搜索和重启不会隐式读取 NFO
+- [查看完整兼容范围和迁移说明](./doc/wiki/third-party-scraped-library-compatibility.md)
+
 ---
 
 <a id="architecture-overview"></a>
@@ -297,9 +309,9 @@ Worker process exited unexpectedly
 <!-- repo-report:start -->
 ## 开发简报
 
-> 自动更新：2026/07/20 13:00（Asia/Shanghai）
+> 自动更新：2026/04/13 01:36（Asia/Shanghai）
 
-累计：版本发布数 59，已完成 Issue 52，未计划 Issue 10
+累计：版本发布数 33，已完成 Issue 13，未计划 Issue 1
 
-当周（最近 7 天）：版本发布数 2，已完成 Issue 7，未计划 Issue 2
+当周（最近 7 天）：版本发布数 7，已完成 Issue 5，未计划 Issue 1
 <!-- repo-report:end -->
