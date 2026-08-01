@@ -114,7 +114,7 @@ https://example.com/video/ABC-123.mp4
 - 相对路径：`../video/ABC-123.mp4`
 - 其它协议：`alist://abc-123`、`rtsp://...`
 
-更完整的 `.strm` 内容规则见 [doc/modules/22-strm-file-rules.md](./doc/modules/22-strm-file-rules.md)。
+更完整的 `.strm` 内容规则见 [doc/wiki/strm-file-rules.md](./doc/wiki/strm-file-rules.md)。
 
 ## 4. 当前不支持或不自动进入主链的情况
 
