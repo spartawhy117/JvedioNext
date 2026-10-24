@@ -37,6 +37,7 @@
 - **浏览与详情**：影片卡会显示个人评分和收藏状态；MDCX 影片详情可浏览目录内剧照，并在大图预览中逐张切换
 - **非标准本地库**：面向论坛或社区下载的国产、OF 等非标准 JAV 电影数据，保留原目录结构，按文件夹层级自动组织合集，并支持自定义标签管理
 - **搜索页**：按 `VID`、演员原词和 `Tag` 原词搜索远端影片，并显示标准库已存在、本地库已存在、已收藏或未入库，方便按演员或标签查漏补库
+- **网页入库标记油猴插件**：在 Tampermonkey 安装 Portable 包内的 WebMarker 用户脚本并启动 `WebMarker` 后，可在 JavDB / JavBus 支持的列表页为本地已入库影片显示“已入库”标记
 - **演员页**：补全演员扩展信息，并按年龄、身高和罩杯筛选
 - **标签页 / 收藏页**：统一浏览、收藏和回看影片、标签与演员
 - **库健康**：集中查看抓取状态、资源缺口、规则问题、失效记录和分组一致性
@@ -92,6 +93,7 @@ Jellyfin 这类工具更适合做家庭媒体服务器和播放入口；`JvedioN
 - [使用指南](https://github.com/spartawhy117/JvedioNext/wiki/User-Guide)
 - [两种库模式速览](#library-modes-quick)
 - [MDCX 兼容使用说明](./doc/wiki/mdcx-compatibility-guide.md)
+- [WebMarker 油猴插件使用说明](https://github.com/spartawhy117/JvedioNext/wiki/WebMarker-Guide)
 - [标准库命名规则](./standard-library-naming-rules.md)
 
 ### 功能预览
@@ -316,9 +318,9 @@ Worker process exited unexpectedly
 <!-- repo-report:start -->
 ## 开发简报
 
-> 自动更新：2026/10/19 14:25（Asia/Shanghai）
+> 自动更新：2026/04/13 01:36（Asia/Shanghai）
 
-累计：版本发布数 68，已完成 Issue 86，未计划 Issue 15
+累计：版本发布数 33，已完成 Issue 13，未计划 Issue 1
 
-当周（最近 7 天）：版本发布数 0，已完成 Issue 0，未计划 Issue 1
+当周（最近 7 天）：版本发布数 7，已完成 Issue 5，未计划 Issue 1
 <!-- repo-report:end -->

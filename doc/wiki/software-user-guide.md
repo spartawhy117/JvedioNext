@@ -240,6 +240,7 @@ MDCX 抓取目录的扫描、抓取、演员和用户数据迁移边界见：[MD
 | 批量选择 | 进入批量模式后整卡选择，动作在顶部工具条 |
 | 随机选片 | 遵守当前搜索、合集层级、评分和资源筛选 |
 | 删除与移除 | `移除` 只删软件记录，危险删除会走确认弹窗 |
+| 网页本地入库标记 | 安装 WebMarker 油猴插件并启动独立服务后，在 JavDB/JavBus 支持的结果页显示“已入库”；完整安装、更新和排障见[《WebMarker 油猴插件使用说明》](https://github.com/spartawhy117/JvedioNext/wiki/WebMarker-Guide) |
 
 ## 5. 页面速查
 
@@ -314,6 +315,15 @@ MDCX 抓取目录的扫描、抓取、演员和用户数据迁移边界见：[MD
 
 导入旧用户数据前会提示本地库兼容调整：旧合集规则会清理，导入后的本地库按目录树重新组织；不会移动、改名或删除媒体文件。导入完成后到 `库管理` 执行一次 `刷新目录`。
 
+### 7.6 使用 WebMarker 油猴插件标记已入库影片
+
+1. 解压 Portable 包后，打开根目录的 `WebMarker` 文件夹。
+2. 在 Tampermonkey 安装同目录的 WebMarker 油猴插件 `jvedio-library-marker.user.js`。
+3. 双击 `WebMarker.exe`；它会优先自动查找安装目录 `data\<Windows用户名>\app_datas.sqlite`。
+4. 打开 JavDB 或 JavBus 的支持列表页；已存在于所选数据库的番号显示“已入库”。
+
+首次选择数据库、支持页面、油猴插件更新和完整排障步骤见：[《WebMarker 油猴插件使用说明》](https://github.com/spartawhy117/JvedioNext/wiki/WebMarker-Guide)。WebMarker 会在 Windows 通知区域保持独立图标，不需要启动 Jvedio 桌面端或 Worker。
+
 ## 8. 排障
 
 | 问题 | 优先查看 |
@@ -326,10 +336,12 @@ MDCX 抓取目录的扫描、抓取、演员和用户数据迁移边界见：[MD
 | 本地库合集入口没有显示 | 确认子目录或其后代已有已导入影片，再执行 `刷新目录` |
 | 文件没有进入标准库 | `库健康 -> 查看文件规则问题` 和 `standard-library-naming-rules.md` |
 | `.strm` 没有入库或不能播放 | 检查 `.strm` 文件名、文件内容和播放器 URL 支持 |
+| 网页没有显示“已入库” | 确认 WebMarker 油猴插件已启用、WebMarker 托盘状态、所选 `app_datas.sqlite` 和 `127.0.0.1:12121` 端口；Jvedio / Worker 不需要启动，详细步骤见[《WebMarker 油猴插件使用说明》](https://github.com/spartawhy117/JvedioNext/wiki/WebMarker-Guide) |
 
 ## 相关文档
 
 - `README.md`：项目首页、快速介绍、环境准备和核心页面概览。
 - `CHANGELOG.md`：正式版本更新记录。
 - `standard-library-naming-rules.md`：标准库命名规则和 `.strm` 基础规则。
+- [WebMarker 油猴插件使用说明](https://github.com/spartawhy117/JvedioNext/wiki/WebMarker-Guide)：安装、更新和排障说明。
 - GitHub Wiki：当前使用指南和左侧目录。
