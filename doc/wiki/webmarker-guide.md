@@ -115,4 +115,4 @@ WebMarker 会记住一次有效的手工选择；当安装目录再次出现唯�
 ## 相关文档
 
 - [JvedioNext 使用指南](https://github.com/spartawhy117/JvedioNext/wiki/User-Guide)
-- [标准库命名规则](https://github.com/spartawhy117/JvedioNext/blob/master/standard-library-naming-rules.md)
+- [标准库命名规则](https://github.com/spartawhy117/JvedioNext/blob/master/doc/wiki/standard-library-naming-rules.md)

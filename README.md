@@ -13,7 +13,7 @@
   ·
   <a href="https://github.com/spartawhy117/JvedioNext/wiki/User-Guide">使用指南</a>
   ·
-  <a href="./standard-library-naming-rules.md">标准库命名规则</a>
+  <a href="./doc/wiki/standard-library-naming-rules.md">标准库命名规则</a>
   ·
   <a href="./CHANGELOG.md">版本更新记录</a>
 </p>
@@ -94,7 +94,7 @@ Jellyfin 这类工具更适合做家庭媒体服务器和播放入口；`JvedioN
 - [两种库模式速览](#library-modes-quick)
 - [MDCX 兼容使用说明](./doc/wiki/mdcx-compatibility-guide.md)
 - [WebMarker 油猴插件使用说明](https://github.com/spartawhy117/JvedioNext/wiki/WebMarker-Guide)
-- [标准库命名规则](./standard-library-naming-rules.md)
+- [标准库命名规则](./doc/wiki/standard-library-naming-rules.md)
 
 ### 功能预览
 
@@ -119,7 +119,7 @@ Jellyfin 这类工具更适合做家庭媒体服务器和播放入口；`JvedioN
 - 需要补充信号：无码样本必须能从文件名识别厂商、来源或已登记系列号，才会进入标准库抓取主链
 - 不支持自动入库：裸日期号无码不会直接作为标准库 `VID` 抓取
 - `.strm` 也必须遵循标准库命名规则，且文件内容只支持单行绝对 `http/https` 地址
-- 详细支持范围、后缀规则和不支持情况见：[标准库命名规则](./standard-library-naming-rules.md)
+- 详细支持范围、后缀规则和不支持情况见：[标准库命名规则](./doc/wiki/standard-library-naming-rules.md)
 
 ---
 
@@ -179,7 +179,7 @@ Worker process exited unexpectedly
 
 - 当前 `.strm` 支持只适用于 `MetaTube` 标准库
 - 文件名需要遵循标准库命名，文件内容只支持单行绝对 `http/https` 地址
-- 详细写法与命名边界见：[标准库命名规则](./standard-library-naming-rules.md)
+- 详细写法与命名边界见：[标准库命名规则](./doc/wiki/standard-library-naming-rules.md)
 
 <a id="core-overview"></a>
 ## 核心页面概览
