@@ -2,7 +2,7 @@ name: 功能建议
 description: 提交新功能或现有行为优化建议
 title: "[Feature] "
 labels:
-  - enhancement
+  - 功能建议
 body:
   - type: markdown
     attributes:

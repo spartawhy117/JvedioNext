@@ -2,7 +2,7 @@ name: 缺陷反馈
 description: 反馈实际存在的问题、异常或回归
 title: "[Bug] "
 labels:
-  - bug
+  - 缺陷
 body:
   - type: markdown
     attributes:

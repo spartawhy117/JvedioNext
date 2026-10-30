@@ -22,19 +22,19 @@ jobs:
             const title = (issue.title || "").trim();
             const existingLabels = issue.labels.map(label => label.name);
 
-            const complianceLabel = "needs:compliance";
-            const triageLabel = "needs:triage";
+            const complianceLabel = "待补全模板";
+            const triageLabel = "待分诊";
             const complianceMarker = "<!-- issue-template-compliance -->";
             const otherModuleMarker = "<!-- issue-other-module-reminder -->";
             const autoClosedBody = "由于未在 2 小时内补全模板必填信息，这个 issue 已自动关闭。请整理后按中文 Issue 模板重新提交。";
-            const managedAreaLabels = ["library", "标准库", "非标准库", "metatube", "scan", "ui", "other"];
+            const managedAreaLabels = ["标准库", "非标准库", "MetaTube", "扫描整理", "界面", "其它"];
             const moduleLabelMap = {
               "标准库": { name: "标准库", color: "1D76DB", description: "标准番号库相关问题或建议" },
               "非标准库": { name: "非标准库", color: "5319E7", description: "非标准本地库相关问题或建议" },
-              "MetaTube": { name: "metatube", color: "0052CC", description: "MetaTube 抓取链相关" },
-              "扫描整理": { name: "scan", color: "0E8A16", description: "扫描、整理、导入链路相关" },
-              "UI": { name: "ui", color: "FBCA04", description: "界面、交互、显示相关" },
-              "其它": { name: "other", color: "D4C5F9", description: "未归类的其它问题或建议" },
+              "MetaTube": { name: "MetaTube", color: "0052CC", description: "MetaTube 抓取链相关" },
+              "扫描整理": { name: "扫描整理", color: "0E8A16", description: "扫描、整理、导入链路相关" },
+              "UI": { name: "界面", color: "FBCA04", description: "界面、交互、显示相关" },
+              "其它": { name: "其它", color: "D4C5F9", description: "未归类的其它问题或建议" },
             };
 
             function escapeRegExp(text) {
@@ -194,9 +194,9 @@ jobs:
             }
 
             let issueType = null;
-            if (existingLabels.includes("bug")) {
+            if (existingLabels.includes("缺陷")) {
               issueType = "bug";
-            } else if (existingLabels.includes("enhancement")) {
+            } else if (existingLabels.includes("功能建议")) {
               issueType = "feature";
             } else if (body.includes("### 日志压缩包或日志内容")) {
               issueType = "bug";
