@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="./doc/UI/preview/readme-icon.svg" alt="JvedioNext" width="128" />
+  <img src="./assets/readme/readme-icon.svg" alt="JvedioNext" width="128" />
   <br>
   JvedioNext
 </h1>
@@ -63,23 +63,23 @@ Jellyfin 这类工具更适合做家庭媒体服务器和播放入口；`JvedioN
 ## 预览
 
 <p align="center">
-  <img src="./doc/UI/preview/dark.png" alt="影片库暗色预览" width="49%" />
-  <img src="./doc/UI/preview/light.png" alt="影片库亮色预览" width="49%" />
+  <img src="./assets/readme/dark.png" alt="影片库暗色预览" width="49%" />
+  <img src="./assets/readme/light.png" alt="影片库亮色预览" width="49%" />
 </p>
 
 <p align="center">
-  <img src="./doc/UI/preview/searchPage.png" alt="搜索页预览" width="49%" />
-  <img src="./doc/UI/preview/actors.png" alt="演员页预览" width="49%" />
+  <img src="./assets/readme/searchPage.png" alt="搜索页预览" width="49%" />
+  <img src="./assets/readme/actors.png" alt="演员页预览" width="49%" />
 </p>
 
 <p align="center">
-  <img src="./doc/UI/preview/tagPage.png" alt="标签页预览" width="49%" />
-  <img src="./doc/UI/preview/favoritePag.png" alt="收藏页预览" width="49%" />
+  <img src="./assets/readme/tagPage.png" alt="标签页预览" width="49%" />
+  <img src="./assets/readme/favoritePag.png" alt="收藏页预览" width="49%" />
 </p>
 
 <p align="center">
-  <img src="./doc/UI/preview/setting.png" alt="设置页预览" width="49%" />
-  <img src="./doc/UI/preview/setting2.png" alt="设置诊断页预览" width="49%" />
+  <img src="./assets/readme/setting.png" alt="设置页预览" width="49%" />
+  <img src="./assets/readme/setting2.png" alt="设置诊断页预览" width="49%" />
 </p>
 
 ---
@@ -308,7 +308,7 @@ Worker process exited unexpectedly
 如果这个项目帮你省下了一些整理和排错时间，欢迎扫码支持开发者继续维护。
 
 <p align="center">
-  <img src="./doc/UI/preview/wechatpay.png" alt="微信支付收款码" width="280" />
+  <img src="./assets/readme/wechatpay.png" alt="微信支付收款码" width="280" />
 </p>
 
 </details>
@@ -318,9 +318,9 @@ Worker process exited unexpectedly
 <!-- repo-report:start -->
 ## 开发简报
 
-> 自动更新：2026/11/05 15:40（Asia/Shanghai）
+> 自动更新：2026/04/13 01:36（Asia/Shanghai）
 
-累计：版本发布数 71，已完成 Issue 95，未计划 Issue 0
+累计：版本发布数 33，已完成 Issue 13，未计划 Issue 1
 
-当周（最近 7 天）：版本发布数 2，已完成 Issue 4，未计划 Issue 0
+当周（最近 7 天）：版本发布数 7，已完成 Issue 5，未计划 Issue 1
 <!-- repo-report:end -->
