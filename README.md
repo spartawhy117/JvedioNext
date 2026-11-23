@@ -89,14 +89,15 @@ Jellyfin 这类工具更适合做家庭媒体服务器和播放入口；`JvedioN
 
 ### Docker 部署
 
-12.0.0 起提供 Linux amd64 运行时镜像：浏览器打开即可使用完整媒体库，不需要启动桌面端。
+12.0.0 起提供官方镜像：浏览器打开即可使用完整媒体库，不需要启动桌面端。
 
 ```sh
-gunzip -c JvedioDocker_12.0.0_runtime_linux-amd64.tar.gz | docker load
-docker compose --env-file /srv/jvedio/jvedio.env -f deployment/docker/compose.yaml up -d
+docker pull ghcr.io/spartawhy117/jvedionext:12.0.0
 ```
 
-镜像获取、目录权限、访问控制、抓取配置、升级与迁移见 [Docker 镜像部署与使用](doc/wiki/docker-image-deployment.md)。
+准备好三个数据目录、写一份 env 文件，`docker compose up -d` 即可启动。离线部署可改用 Release 页的镜像包。
+
+完整步骤（目录准备、env 逐项说明、局域网与口令访问、抓取配置、升级与迁移）见 [Docker 镜像部署与使用](doc/wiki/docker-image-deployment.md)。
 
 ### 新用户先看
 

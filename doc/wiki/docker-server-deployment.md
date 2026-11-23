@@ -1,6 +1,6 @@
 # Docker 服务器部署与恢复
 
-> 本机 Linux amd64 容器已完成开发与运行镜像验证，证据见 `doc/testing/modules/docker-web.md`。私有候选已在远端构建、推送并由新 Linux job 按 digest 拉取运行；示例仍可使用本地构建。正式公开镜像分发和独立 Linux/NAS 实机未验证。
+> 本机 Linux amd64 容器已完成开发与运行镜像验证，证据见 `doc/testing/modules/docker-web.md`。官方镜像自 12.0.0 起由 GitHub Actions 在每次发布时自动构建并推送到 GHCR（`ghcr.io/spartawhy117/jvedionext`，见 [Docker 镜像部署与使用](docker-image-deployment.md)）；私有候选仍按 digest 拉取运行，示例也可使用本地构建。独立 Linux/NAS 实机未验证。
 
 ## 1. 准备目录和镜像
 
@@ -11,7 +11,7 @@
 从仓库根构建，产品版本应与 `tauri/package.json` 一致，源码版本取实际 Git revision，未提交工作区加 `-dirty`：
 
 ```sh
-docker build -f deployment/docker/Dockerfile --target runtime --build-arg APP_VERSION=11.4.0 --build-arg SOURCE_REVISION=<实际revision> -t jvedio:local .
+docker build -f deployment/docker/Dockerfile --target runtime --build-arg APP_VERSION=12.0.0 --build-arg SOURCE_REVISION=<实际revision> -t jvedio:local .
 ```
 
 最终产物身份（ZIP SHA256、runtime/dev/升级实验镜像 ID）见 `docs/plan/archived/feature_cross-platform-final-acceptance.md` §四与 `docs/plan/archived/feature_test-coverage-and-cross-platform-acceptance.md` §4；有该私有包读取权限的账号登录GHCR后，可按完整 `镜像地址@sha256:...` 拉取并填写 `JVEDIO_IMAGE`。使用digest可固定已验证产物，不能将候选tag当作自动发现的最新版本。
