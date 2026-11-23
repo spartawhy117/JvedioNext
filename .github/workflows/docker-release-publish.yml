@@ -1,0 +1,132 @@
+name: Docker Release Publish
+
+run-name: Publish ${{ github.event.release.tag_name }}
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-release-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY_IMAGE: ghcr.io/spartawhy117/jvedionext
+  REGISTRY_PACKAGE: jvedionext
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Validate release tag
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          # private 仓的 GitHub Release 只对应正式版本；候选包禁止建 release，因此 tag 必须是纯语义版本。
+          if ! printf '%s' "$RELEASE_TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Release tag must match ^v<major>.<minor>.<patch>; got '$RELEASE_TAG'."
+            exit 1
+          fi
+          echo "VERSION=${RELEASE_TAG#v}" >> "$GITHUB_ENV"
+
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Assert package.json version matches tag
+        run: |
+          set -euo pipefail
+          pkg_version=$(node -p "require('./tauri/package.json').version")
+          if [ "$pkg_version" != "$VERSION" ]; then
+            echo "::error::tauri/package.json version '$pkg_version' does not match release tag '$VERSION'. Bump the version before tagging."
+            exit 1
+          fi
+
+      - name: Build runtime image and execute native contracts
+        shell: pwsh
+        run: ./scripts/build-docker.ps1 -Target runtime -Image jvedio:release -NoExport
+
+      - name: Verify runtime contents
+        run: |
+          docker run --rm --network none --entrypoint sh jvedio:release -ec '
+            test "$(id -u)" = 1000
+            test -f /app/wwwroot/index.html
+            test ! -d /usr/share/dotnet/sdk
+            test ! -d /app/node_modules
+            test ! -d /app/test-data
+            test ! -d /app/tests
+            test ! -d /app/auth
+            ffmpeg -version >/dev/null
+            ffprobe -version >/dev/null'
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push version and latest tags
+        run: |
+          set -euo pipefail
+          docker tag jvedio:release "$REGISTRY_IMAGE:$VERSION"
+          docker tag jvedio:release "$REGISTRY_IMAGE:latest"
+          docker push "$REGISTRY_IMAGE:$VERSION"
+          docker push "$REGISTRY_IMAGE:latest"
+
+      - name: Ensure package visibility is public
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          visibility=$(gh api "/users/spartawhy117/packages/container/$REGISTRY_PACKAGE" --jq .visibility 2>/dev/null || true)
+          if [ "$visibility" != "public" ]; then
+            echo "Package visibility is '${visibility:-absent}'; attempting to set public (first push links this package to the repository)."
+            gh api --method PATCH "/users/spartawhy117/packages/container/$REGISTRY_PACKAGE" -f visibility=public 2>/dev/null || true
+            visibility=$(gh api "/users/spartawhy117/packages/container/$REGISTRY_PACKAGE" --jq .visibility 2>/dev/null || true)
+          fi
+          if [ "$visibility" != "public" ]; then
+            echo "::error::$REGISTRY_IMAGE is still '${visibility:-not queryable}'. One-time manual bootstrap required: open $REGISTRY_IMAGE on GitHub, switch package visibility to public, then re-run this job. The image content for '$VERSION' is already pushed."
+            exit 1
+          fi
+          echo "visibility=public confirmed for $REGISTRY_IMAGE"
+
+      - name: Verify registry roundtrip and record receipt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          digest=$(docker image inspect "$REGISTRY_IMAGE:$VERSION" --format '{{index .RepoDigests 0}}' | cut -d@ -f2)
+          test "${digest#sha256:}" != "$digest"
+          docker pull "$REGISTRY_IMAGE@$digest" >/dev/null
+          docker run --rm --network none --entrypoint sh "$REGISTRY_IMAGE@$digest" -ec '
+            test "$(id -u)" = 1000
+            test -f /app/wwwroot/index.html
+            ffmpeg -version >/dev/null
+            ffprobe -version >/dev/null'
+          printf '{"version":"%s","versionTag":"%s","latestTag":"%s","digest":"%s","visibility":"public"}\n' "$VERSION" "$REGISTRY_IMAGE:$VERSION" "$REGISTRY_IMAGE" "$digest" > release-image-receipt.json
+          cat release-image-receipt.json
+
+      - name: Upload image receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-image-receipt
+          path: release-image-receipt.json
+          retention-days: 90
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-build-receipts
+          path: temp/docker-build/
+          retention-days: 30

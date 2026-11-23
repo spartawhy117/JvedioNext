@@ -66,4 +66,4 @@ MDCX NFO 的 `<genre>` 与 `<tag>` 都会显示为影片“类型”，相同文
 ## 相关文档
 
 - [使用指南](software-user-guide.md)
-- [实现与后端边界](../modules/35-external-managed-media-library-compatibility-design.md)
+- [实现与后端边界](../modules/library/35-external-managed-media-library-compatibility-design.md)
