@@ -1,7 +1,7 @@
 name: GHCR Public Mirror
 
 # 公开仓侧的镜像归属：GitHub 仓库侧栏只列「由该仓库发布」的包。
-# 镜像本体由私有仓构建推送，这里只做一次同注册表复推，使包在公开仓 Packages 下可见。
+# 镜像本体由私有仓构建推送，这里派生出新 digest 再推，使其登记为公开仓的发布。
 on:
   workflow_dispatch:
     inputs:
@@ -48,16 +48,28 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Mirror version tag
+      - name: Derive image with mirror label
         run: |
           set -euo pipefail
-          docker pull "$IMAGE:$TAG"
-          docker tag "$IMAGE:$TAG" "$IMAGE:$TAG"
-          docker push "$IMAGE:$TAG"
+          # 直接复推同一 digest 不会被登记为「本仓发布」；派生一层改变 digest。
+          printf 'FROM %s:%s\nLABEL org.jvedio.mirror=%s\n' "$IMAGE" "$TAG" "$TAG" > /tmp/Dockerfile.mirror
+          docker build -f /tmp/Dockerfile.mirror -t "$IMAGE:$TAG" .
 
-      - name: Mirror latest tag
+      - name: Push version and latest
         run: |
           set -euo pipefail
-          docker pull "$IMAGE:$TAG"
+          docker push "$IMAGE:$TAG"
           docker tag "$IMAGE:$TAG" "$IMAGE:latest"
           docker push "$IMAGE:latest"
+
+      - name: Record digest
+        run: |
+          digest=$(docker image inspect "$IMAGE:$TAG" --format '{{index .RepoDigests 0}}' | cut -d@ -f2)
+          printf '{"tag":"%s","digest":"%s"}\n' "$TAG" "$digest" > mirror-receipt.json
+          cat mirror-receipt.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mirror-receipt
+          path: mirror-receipt.json
+          retention-days: 30
