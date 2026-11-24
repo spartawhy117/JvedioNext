@@ -27,7 +27,7 @@ docker compose --env-file /absolute/path/jvedio.env -f deployment/docker/compose
 
 默认只监听宿主 `127.0.0.1:8080`。局域网访问时设置 `JVEDIO_BIND_ADDRESS`、`JVEDIO_PORT`，并在 `JVEDIO_ALLOWED_HOSTS` 填入浏览器实际使用的主机名/IP，不含协议、不使用通配符；需要限制端口时可填写 `host:port`。浏览器打开对应地址即可使用（trusted 模式无登录页）；本地开发容器同样默认无门禁（加 `-Password` 才启用密码）。；password 模式用密码文件内容登录。新建库时选择服务器 `/media` 下的授权目录，不能选择浏览器设备的本地目录。
 
-媒体默认 `JVEDIO_MEDIA_ACCESS=ro`。只读挂载允许浏览/播放、MDCX读取和应用内收藏等操作；整理、写回和物理删除需要明确设为 `rw`。MDCX来源即使卷可写，仍遵守本项目外部来源保护规则。修改挂载、授权根或（password 模式的）密码后按部署规则重启，不在页面任意授权服务器目录。
+媒体默认 `JVEDIO_MEDIA_ACCESS=ro`。库的媒体路径不是配置文件项：后端按挂载指纹把 `JVEDIO_MEDIA_ROOTS` 登记为授权根，页面建库时经 `/api/server/directories` 浏览并选中目录，路径随建库请求写入后端；换盘或重新挂载导致指纹不匹配时库标记离线，重新挂回原盘恢复。只读挂载允许浏览/播放、MDCX读取和应用内收藏等操作；整理、写回和物理删除需要明确设为 `rw`。MDCX来源即使卷可写，仍遵守本项目外部来源保护规则。修改挂载、授权根或（password 模式的）密码后按部署规则重启，不在页面任意授权服务器目录。
 
 局域网直连为明文 HTTP：仅在自己信任的内网使用；跨网段 / 宿主共享时建议反向代理加 TLS。**本机浏览器访问 `127.0.0.1` 端口时若配置了系统代理，请确保代理放行或绕过本地回环**（部分代理工具默认劫持本机端口，表现为页面首载「数据加载失败 / 重试」）。反向代理部署时，配置精确 `JVEDIO_PUBLIC_ORIGIN`（例如 `https://media.example.test`）、`JVEDIO_TRUSTED_PROXIES`（实际代理IP）及Host白名单。代理须转发HTTP流和SSE，允许大文件上传与Range；HTTPS访问使用安全Cookie。不要将服务器 origin 配成 `localhost` 后要求远端浏览器使用。
 
