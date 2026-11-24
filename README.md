@@ -91,23 +91,33 @@ Jellyfin 这类工具更适合做家庭媒体服务器和播放入口；`JvedioN
 
 12.0.0 起提供官方镜像：浏览器打开即可使用完整媒体库，不需要启动桌面端。
 
+**一条命令就能跑**——服务器模式、目录约定、局域网访问都已内置于镜像，不需要任何 `-e`：
+
 ```sh
-docker pull ghcr.io/spartawhy117/jvedionext:12.0.0
+mkdir -p /srv/jvedio/config && sudo chown -R 1000:1000 /srv/jvedio
+
+docker run -d --name jvedio -p 8080:8080 \
+  -v /srv/jvedio/config:/config \
+  -v /volume1/AV:/media:ro \
+  ghcr.io/spartawhy117/jvedionext:latest
 ```
 
-准备好三个数据目录、写一份 env 文件，`docker compose up -d` 即可启动。离线部署可改用 Release 页的镜像包。
+只需准备**一个** `config` 目录；`/volume1/AV` 换成你自己的片源目录即可（不用新建）。打开 `http://127.0.0.1:8080` 直接使用。
 
-完整步骤（目录准备、env 逐项说明、局域网与口令访问、抓取配置、升级与迁移）见 [Docker 镜像部署与使用](doc/wiki/docker-image-deployment.md)。
+长期使用建议改用 compose（升级只需改一行），离线环境可用 Release 页的镜像包导入。
+
+完整说明（镜像标签、compose 配置、访问控制、多盘挂载、升级）见 [Docker 镜像部署与使用](doc/wiki/docker-image-deployment.md)。
 
 ### 新用户先看
 
 - [最新版本下载](https://github.com/spartawhy117/JvedioNext/releases/latest)
 - [首次启动前请先准备环境](#environment)
+- **Docker 部署**：[一条命令跑起来](#docker-部署) 或 [完整说明](https://github.com/spartawhy117/JvedioNext/wiki/Docker-Deployment)
 - [使用指南](https://github.com/spartawhy117/JvedioNext/wiki/User-Guide)
 - [两种库模式速览](#library-modes-quick)
-- [MDCX 兼容使用说明](./doc/wiki/mdcx-compatibility-guide.md)
+- [MDCX 兼容使用说明](https://github.com/spartawhy117/JvedioNext/wiki/MDCX-Compatibility)
 - [WebMarker 油猴插件使用说明](https://github.com/spartawhy117/JvedioNext/wiki/WebMarker-Guide)
-- [标准库命名规则](./doc/wiki/standard-library-naming-rules.md)
+- [标准库命名规则](https://github.com/spartawhy117/JvedioNext/wiki/Naming-Rules)
 
 ### 功能预览
 

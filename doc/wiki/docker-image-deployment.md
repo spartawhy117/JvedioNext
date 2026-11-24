@@ -1,128 +1,143 @@
 # Docker 镜像部署与使用
 
 > 适用于 12.1.0 起的 Linux amd64 官方镜像：浏览器打开即可使用完整媒体库，不需要启动桌面端。
->
-> 只想先跑起来看看：完成阶段 1 即可，大约 10 分钟。要让扫描、抓取、整理真正转起来，再完成阶段 2。
 
-## 开始前
+## 本文结构
 
-- 一台 Linux x86_64 主机或 NAS，已安装 Docker 和 Docker Compose v2。
-- 想好两个位置：一个放运行数据（数据库、设置、日志），一个放你的影片。两者互相独立。
-- 官方镜像由 GitHub Actions 在每次发布时自动构建并推送，版本号标签与 Release 完全一致。
+| 章节 | 看什么 |
+| --- | --- |
+| [容器镜像](#容器镜像) | 镜像地址与标签语义 |
+| [安装前准备](#安装前准备) | 系统要求、两个目录怎么规划 |
+| [快速试用](#快速试用可选) | 只想看一眼效果（可跳过） |
+| [正式部署](#正式部署) | 长期使用的完整配置（5 步） |
+| [验证安装](#验证安装) | 三层判断是否装好 |
+| [首次配置向导](#首次配置向导) | 浏览器里建库、扫描、抓取（5 步） |
+| [后续步骤](#后续步骤) | 按需求索引到对应进阶章节 |
+| [访问控制](#访问控制) / [多个片源目录](#多个片源目录) / [媒体写权限](#媒体写权限) / [缓存位置](#缓存位置) / [反向代理与 STRM](#反向代理与-strm) / [升级](#升级) | 进阶配置 |
 
-## 阶段 1：部署
+## 容器镜像
 
-### 1. 准备目录
-
-示例假设运行数据放在 `/srv/jvedio`（路径随便换）。**media 不是要新建的目录**——它就是你 NAS 上片源已经存在的位置：
+官方镜像托管在 GitHub Container Registry：
 
 ```text
-/srv/jvedio
-├── config/   # 数据库、设置、日志 —— 整个部署最需要备份的目录
-└── media/    # 你的片源——直接用 NAS 上已有的目录，不必新建
+ghcr.io/spartawhy117/jvedionext
 ```
 
+目前只提供 `linux/amd64` 一种架构。镜像由 GitHub Actions 在每次正式发布时自动构建并推送。
+
+可用的标签：
+
+| 标签 | 含义 | 什么时候用 |
+| --- | --- | --- |
+| `latest` | 始终指向最新正式版本 | **推荐**，跟随版本更新 |
+| `X.Y.Z`（如 `12.1.1`） | 固定到某个具体版本 | 需要冻结版本时 |
+| `sha256:...`（digest） | 固定到字节级一致的产物 | 生产环境，绝对不可变 |
+
+> **digest 是最稳的锁定方式**：版本号标签的语义是「这个 tag 当前指向什么」，tag 理论上可被重建；digest 不会变。
+
+## 安装前准备
+
+### 系统要求
+
+- Linux x86_64 主机或 NAS（Windows / macOS 宿主机不在支持范围）
+- 已安装 Docker 与 Docker Compose v2
+- 一块存放运行数据的磁盘空间（数据库、设置、日志）
+
+### 规划两个目录
+
+Jvedio 需要两个宿主目录，作用完全不同：
+
+| 用途 | 示例路径 | 要新建吗 | 说明 |
+| --- | --- | --- | --- |
+| 运行数据 | `/srv/jvedio/config` | **必须新建** | 数据库、设置、日志；必须备份 |
+| 片源 | `/volume1/AV` | **通常不新建** | 你已有的视频目录，按实际替换 |
+
+> **片源目录不要动它**。已有的视频文件夹直接拿来做挂载源即可，不要移动、不要重组。
+> 只有完全没有视频、从零开始时，才需要建一个空目录（如 `mkdir -p /srv/jvedio/media`）。
+
+缓存不用准备：镜像内已有匿名卷（`/cache`），删容器自动清理。
+
+## 快速试用（可选）
+
+只想先看一眼效果、不打算长期跑，用这一条命令即可：
+
 ```sh
-# config 是唯一必须新建的目录（应用要往里写数据）
+mkdir -p /srv/jvedio/config && sudo chown -R 1000:1000 /srv/jvedio
+
+docker run -d --name jvedio -p 8080:8080 \
+  -v /srv/jvedio/config:/config \
+  -v /volume1/AV:/media:ro \
+  ghcr.io/spartawhy117/jvedionext:latest
+```
+
+打开 `http://127.0.0.1:8080` 就能看到界面。看完后清掉：
+
+```sh
+docker rm -f jvedio
+```
+
+> 长期使用请走下一节「正式部署」。**两者不要同时跑**，会抢同一个 8080 端口。
+> 如果已经跑过本节，正式部署的第 2 步（建目录）可以跳过。
+
+## 正式部署
+
+以下是为长期运行准备的配置，装好后升级只需改一行。
+
+**第 1 步：拉取镜像**
+
+```sh
+docker pull ghcr.io/spartawhy117/jvedionext:latest
+```
+
+**第 2 步：创建运行数据目录**
+
+```sh
 mkdir -p /srv/jvedio/config
 sudo chown -R 1000:1000 /srv/jvedio
-# media 不 mkdir：已有片源就把 JVEDIO_MEDIA_DIR 指向它（如 /volume1/AV）；
-# 从零开始的全新部署才建一个空 media 目录，之后往里放片。
 ```
 
-| 宿主目录 | 容器内 | 作用 | 丢了会怎样 |
-| --- | --- | --- | --- |
-| `config` | `/config` | 数据库、设置、日志 | 媒体库与设置全丢，必须备份 |
-| `media` | `/media` | 你的片源 | 只影响播放/扫描 |
+> **属主必须是运行用户**。容器默认以 UID/GID `1000:1000` 运行（不用 root），`config` 属主不一致会启动即失败。换用户时改 `JVEDIO_UID` / `JVEDIO_GID`。
 
-缓存不需要准备目录：镜像内已有匿名卷（`/cache`），删容器即自动清理。想把缓存落到宿主盘便于观察时，才需要叠加 `-f compose.cache.yaml`。
+**第 3 步：创建 `jvedio.env`**
 
-> **⚠️ 属主必须是运行用户**
-> 容器默认以 UID/GID `1000:1000` 运行（不用 root），`config` 的属主不一致时启动即失败。换其他用户时，把 env 里的 `JVEDIO_UID` / `JVEDIO_GID` 一起改。
-
-### 2. 拉取镜像
+在 `/srv/jvedio/` 下新建这个文件（和 config 同级，**不要放进 config 里面**）：
 
 ```sh
-docker pull ghcr.io/spartawhy117/jvedionext:12.1.1
+cd /srv/jvedio
+nano jvedio.env
 ```
 
-- 版本号标签与 [GitHub Release](https://github.com/spartawhy117/JvedioNext/releases/latest) 一一对应；`latest` 始终指向最新正式版本。
-- 部署机无法直连 GHCR（离线环境）：到 Release 页下载 `JvedioDocker_<版本>_runtime_linux-amd64.tar.gz`，导入本机：
+内容：
 
 ```sh
-gunzip -c JvedioDocker_12.1.1_runtime_linux-amd64.tar.gz | docker load
-# 导入后镜像名是 jvedio:12.1.1，下一步 env 里照这个名字填
-```
-
-- 坚持自行构建（需要源码，仅适用于参与开发的场景）：`docker build -f deployment/docker/Dockerfile --target runtime --build-arg APP_VERSION=12.1.1 -t jvedio:12.1.1 .`
-
-镜像自带 FFmpeg / FFprobe：宿主机不需要另装，也不需要挂载 Docker socket。
-
-### 3. 写 env 文件
-
-在部署目录（按示例是 `/srv/jvedio`）新建 `jvedio.env`。**必改只有三行**：
-
-```sh
-JVEDIO_IMAGE=ghcr.io/spartawhy117/jvedionext:12.1.1
+JVEDIO_IMAGE=ghcr.io/spartawhy117/jvedionext:latest
 JVEDIO_CONFIG_DIR=/srv/jvedio/config
-JVEDIO_MEDIA_DIR=/srv/jvedio/media
+JVEDIO_MEDIA_DIR=/volume1/AV
 ```
 
-其余全部有默认值，不写也能跑。需要时按需追加：
+> `JVEDIO_MEDIA_DIR` 填**你的片源实际目录**，不是新建的空目录。
 
-| 变量 | 什么时候才需要 |
-| --- | --- |
-| `JVEDIO_PORT` / `JVEDIO_UID` / `JVEDIO_GID` | 端口冲突；目录属主不是 1000 |
-| `JVEDIO_MEDIA_ACCESS=rw` | 要让应用整理、写回或物理删除文件 |
-| `JVEDIO_METATUBE_SERVER_URL` | 要抓取资料（不填只是抓取不可用） |
-| `JVEDIO_BIND_ADDRESS=127.0.0.1` | **默认已监听全部网卡**；只想本机访问时改成这个 |
-| `JVEDIO_ALLOWED_HOSTS` | 想限定只接受特定域名/IP（不填则由 LAN 模式自动纳入本机地址） |
-| `JVEDIO_CACHE_HOST_DIR` | 想把缓存落到宿主盘（同时叠加 `-f compose.cache.yaml`） |
-| `JVEDIO_AUTH_MODE=password` + `JVEDIO_ADMIN_SECRET` | headless 环境的固定口令（页面口令门见「访问控制」） |
+**第 4 步：创建 `compose.yaml`**
 
-> **⚠️ 保存前必须检查**
-> - 两个目录路径换成你自己的**绝对路径**；离线导入的镜像把 `JVEDIO_IMAGE` 改成 `jvedio:12.1.1`。
-> - 默认已是「局域网可访问 + 免登录」：绑定全部网卡，Host 白名单由 LAN 模式自动纳入本机地址。
-> - 只想本机使用：加 `JVEDIO_BIND_ADDRESS=127.0.0.1`。需要口令：页面「设置 → 安全」开启。
-> - 暂时不抓取资料可以不填 `JVEDIO_METATUBE_SERVER_URL`，阶段 2 再配。
-
-### 4. 启动：compose 或 docker run 任选
-
-**不想建文件？一条命令也能跑**（镜像已内置服务器模式、目录约定、LAN 默认开启与授权根，无需任何 `-e`）：
+**放在同一个目录**——`/srv/jvedio/compose.yaml`，和 `jvedio.env` 并排：
 
 ```sh
-docker run -d --name jvedio \
-  --user 1000:1000 -p 8080:8080 \
-  -v /srv/jvedio/config:/config \
-  -v /srv/jvedio/media:/media:ro \
-  ghcr.io/spartawhy117/jvedionext:12.1.1
+cd /srv/jvedio
+nano compose.yaml
 ```
 
-镜像里已经烘好了下面三项，所以命令里不必再写：
-
-| 内置变量 | 值 | 效果 |
-| --- | --- | --- |
-| `JVEDIO_LAN_MODE` | `true` | 白名单留空时自动接受本机网卡地址与主机名 |
-| `JVEDIO_MEDIA_ROOTS` | `["/media"]` | 页面目录选择器的授权根，无需额外声明 |
-| `JVEDIO_HOST_MODE` | `server` | 无需手动指定服务器模式 |
-
-需要额外控制时再补 `-e`：
-
-- 只用某个域名访问（而非任意本机地址）：`-e JVEDIO_ALLOWED_HOSTS=media.lan`，显式白名单优先于自动纳入。
-- 想指定别的授权根：`-e JVEDIO_MEDIA_ROOTS='["/media","/media/av"]'`。
-- 只想本机访问：`-e JVEDIO_BIND_ADDRESS=127.0.0.1`（即只映射回环，注意 `-p` 也要跟着改）。
-- 缓存落到宿主盘：加 `-v /srv/jvedio/cache:/cache`。
-
-**推荐长期使用 compose**（便于升级与叠加口令等配置）。同目录新建 `compose.yaml`，内容如下（与仓库 `deployment/docker/compose.yaml` 字段等价，以仓库为准）：
+**整份照抄即可，不需要改动任何一行**——所有可变项都从第 3 步的 `jvedio.env` 读取：
 
 ```yaml
 services:
   jvedio:
     image: ${JVEDIO_IMAGE:-jvedio:local}
+    container_name: jvedio
     user: ${JVEDIO_UID:-1000}:${JVEDIO_GID:-1000}
     init: true
     read_only: true
     stop_grace_period: 45s
+    restart: unless-stopped
     ports:
       - '${JVEDIO_BIND_ADDRESS:-0.0.0.0}:${JVEDIO_PORT:-8080}:8080'
     environment:
@@ -136,92 +151,164 @@ services:
       JVEDIO_MEDIA_ROOTS: '["/media"]'
       JVEDIO_STRM_ALLOWED_ORIGINS: ${JVEDIO_STRM_ALLOWED_ORIGINS:-[]}
       JVEDIO_STRM_ALLOWED_PRIVATE_ORIGINS: ${JVEDIO_STRM_ALLOWED_PRIVATE_ORIGINS:-[]}
-      # 留空 = 由页面「设置 → 安全」的口令门控制；显式填 trusted/password 则固定模式、页面不可改。
       JVEDIO_AUTH_MODE: ${JVEDIO_AUTH_MODE:-}
       JVEDIO_METATUBE_SERVER_URL: ${JVEDIO_METATUBE_SERVER_URL:-}
     volumes:
       - '${JVEDIO_CONFIG_DIR:?Set JVEDIO_CONFIG_DIR}:/config'
-      # 缓存默认使用镜像内匿名卷，不必配置。想把缓存落到宿主盘时叠加 -f compose.cache.yaml。
       - '${JVEDIO_MEDIA_DIR:?Set JVEDIO_MEDIA_DIR}:/media:${JVEDIO_MEDIA_ACCESS:-ro}'
-      # 多片源：取消下一行注释并按需复制
-      # - /volume2/AV:/media/av:ro
     tmpfs:
       - /tmp:size=1g,mode=1777
 ```
 
-> **💡 提示**：本文 compose 与仓库 `deployment/docker/compose.yaml` **字段等价**（仓库版多保留了几条解释性注释）；env 就是仓库 `.env.example` 的精简版——必改的只有开头 3 行（镜像 + 两个目录），其余全部有默认值；照抄本文即可完成部署，不需要获取源码。
+这份文件里没有需要手改的常量，但值得知道关键几行从哪来：
 
-### 5. 启动并验证
+| compose 里的行 | 值从哪来 | 要改吗 |
+| --- | --- | --- |
+| `image:` | `jvedio.env` 的 `JVEDIO_IMAGE` | 不用 |
+| `ports:` | `JVEDIO_BIND_ADDRESS` / `JVEDIO_PORT`（默认 0.0.0.0:8080） | 端口冲突时改 env |
+| `volumes:` 的 `/config` | `JVEDIO_CONFIG_DIR` | 不用 |
+| `volumes:` 的 `/media` | `JVEDIO_MEDIA_DIR` 与 `JVEDIO_MEDIA_ACCESS` | 要写权限时改 env |
+| `user:` | `JVEDIO_UID` / `JVEDIO_GID`（默认 1000:1000） | 目录属主不是 1000 时改 env |
+| `environment:` 其余项 | 全部留空或已内置默认 | 不用 |
+
+> `read_only: true` 表示容器根文件系统只读，运行时需要的可写路径已由 `/tmp`（tmpfs）和两个挂载点覆盖。**保持原样即可**。
+
+**第 5 步：启动**
+
+到这里 `/srv/jvedio/` 应该是这样：
+
+```text
+/srv/jvedio/
+├── config/          # 第 2 步建的运行数据目录
+├── jvedio.env       # 第 3 步建的环境变量
+└── compose.yaml     # 第 4 步建的编排文件
+```
+
+在 `/srv/jvedio/` 下执行（和两个文件同目录）：
 
 ```sh
 cd /srv/jvedio
 docker compose --env-file jvedio.env -f compose.yaml up -d
-docker compose --env-file jvedio.env -f compose.yaml ps
-docker compose --env-file jvedio.env -f compose.yaml logs -f
 ```
 
-1. 首次启动等几秒，浏览器打开 `http://127.0.0.1:8080` —— 默认免登录，直接进入主界面。
-2. 健康检查：`curl -f http://127.0.0.1:8080/health/ready` 有响应即就绪。
-3. 打不开先查「排障」一节：最常见的三个原因是本机代理劫持了 127.0.0.1、目录属主不对、Host 白名单没填。
+`-d` 表示后台运行。想去掉 `-d` 前台看日志也行。
 
-到这里部署就完成了。下面进入日常使用。
+## 验证安装
 
-## 阶段 2：建库、挂片源、接抓取
+分三层判断，**不要只看一层**：
 
-### 1. 新建媒体库
+| 层次 | 检查命令 | 通过标准 | 不通过说明 |
+| --- | --- | --- | --- |
+| 1. 容器活着 | `docker ps --filter name=jvedio` | 状态是 `Up` | 容器启动失败，看下一节 |
+| 2. 服务就绪 | `curl -f http://127.0.0.1:8080/health/ready` | 返回 200 | 应用还在初始化 |
+| 3. **真的能用** | 浏览器打开 `http://127.0.0.1:8080` | 能看到主界面 | 网络 / Host 白名单问题 |
 
-媒体路径**不需要写进任何配置文件**：阶段 1 把片源挂到容器 `/media` 后，后端会按挂载指纹把 `/media` 登记为授权根；页面新建媒体库时弹出目录选择器，浏览并选中服务器上的目录，确认后路径随建库请求写入后端。env 里的 `JVEDIO_MEDIA_DIR` 只决定「宿主机哪个目录挂进容器」，不是库的路径配置。
+三层都通过才算装好了。默认免登录，打开直接进主界面。
 
-- 已有影片不需要提前整理，直接选它们所在的目录。
-- 多块盘：把多个目录挂到 `/media/<名字>` 下（每个一条 `-v` 行），它们都会出现在目录选择器里。
-- 换盘或重新挂载后，库会标记为**离线**，直到后端确认挂载指纹与登记时一致——这是防串盘设计，重新挂回原盘即恢复。
+## 首次配置向导
 
-媒体默认以只读（`ro`）挂载：浏览、播放、收藏都没有问题；要允许应用整理、写回或物理删除文件，把 env 里的 `JVEDIO_MEDIA_ACCESS` 改成 `rw` 后重启容器。
+装好之后还在终端里的部分就结束了，接下来都在浏览器里点。
 
-### 2. 配置 MetaTube 抓取
+### 第 1 步：打开页面
 
-标准库的资料抓取依赖一个可访问的 MetaTube 服务。两种配法任选其一：
+浏览器访问 `http://127.0.0.1:8080`。局域网其他设备用 `http://<服务器IP>:8080`。
+
+> **[图片插入位置 1]**
+> 主界面首次打开的样子（空媒体库状态）
+
+### 第 2 步：新建媒体库
+
+点「新建媒体库」，在弹出的对话框里：
+
+| 字段 | 怎么填 |
+| --- | --- |
+| 库名称 | 随意，比如「我的片库」 |
+| 库类型 | **标准库**（有番号、需抓取资料）或**本地库**（无番号、仅本地浏览） |
+| 目录 | 点目录选择器，选中片源目录 |
+
+> **[图片插入位置 2]**
+> 新建媒体库对话框（库类型下拉 + 目录选择器）
+
+**看不到任何目录？** 说明片源没挂对——回到安装步骤检查 `volumes` 那段，确认宿主路径存在且容器内可读：
+
+```sh
+docker exec jvedio ls /media
+```
+
+这条命令应该列出你的影片文件。列不出来就是挂载问题，不是库配置问题。
+
+> **[图片插入位置 3]**
+> 目录选择器里能看到片源目录的样子
+
+### 第 3 步：扫描
+
+保存库之后触发扫描。首次扫描时间取决于片源数量，可以先选一个小目录试。
+
+> **[图片插入位置 4]**
+> 扫描任务进度界面
+
+扫描完成后库列表里应出现影片卡片。如果扫出 0 个，按顺序查：
+
+| 现象 | 原因 | 处理 |
+| --- | --- | --- |
+| 0 个影片 | 目录选择器里选错了层级 | 重选到影片直接所在的目录 |
+| 0 个影片 | 文件名不符合命名规则 | 见 [标准库命名规则](Naming-Rules) |
+| 有卡片但没封面 | 还没抓取 | 见第 4 步 |
+
+### 第 4 步：配置资料抓取（可选）
+
+标准库的封面与资料来自 MetaTube 服务。**不配也能用**——浏览、播放都正常，只是没有封面和演员信息。
+
+两种配法任选：
 
 | 配法 | 做法 | 生效时机 |
 | --- | --- | --- |
-| env 注入（推荐） | `JVEDIO_METATUBE_SERVER_URL=http://<metatube地址>:8080` 写进 jvedio.env | 重启容器后 |
-| 页面设置 | 在设置的 MetaTube 配置里填写服务地址 | 保存后 |
+| env 注入 | `JVEDIO_METATUBE_SERVER_URL=http://<地址>:8080` | 重启容器 |
+| 页面设置 | 设置 → MetaTube 配置里填地址 | 保存即生效 |
 
-不配会怎样：建库、扫描、本地浏览和播放全部正常，但抓取任务会直接失败（提示 MetaTube 未配置）。地址可以之后随时补。
+> **[图片插入位置 5]**
+> 设置页的 MetaTube 配置区块
 
-### 3. 验证
+配好后在库上触发「抓取」，封面与资料会补上。
 
-- 先选一个**小目录**建库扫描，跑通整个流程再加大批量；
-- 打开一部影片确认能播放；
-- 触发一次抓取，确认封面与资料能补上。
+> **[图片插入位置 6]**
+> 抓取完成后的影片详情页（有封面、演员、标签）
 
-### 可选：从 Windows 桌面端迁移
+### 第 5 步：确认能播放
 
-1. 桌面端「导出用户数据」，得到数据包；
-2. 网页端导入，逐项把原 Windows 媒体根映射到 `/media` 下的目录；
-3. **先把片源挂进 `/media` 再导入**——数据包不含媒体文件，只含数据库、设置与演员头像；海报、缩略图与 NFO 都是媒体旁的 sidecar，片源不在就没有海报也不能播放。
+点开一部影片，确认能播放。不能播放通常是片源路径与库记录不一致——按第 2 步的 `docker exec jvedio ls /media` 确认文件在容器里可见。
+
+> **[图片插入位置 7]**
+> 影片播放界面
+
+## 后续步骤
+
+装好之后按需求挑着看：
+
+| 你的需求 | 看这里 |
+| --- | --- |
+| 想让手机 / 平板也能访问 | [访问控制](#访问控制) |
+| 片源散在多块盘 | [多个片源目录](#多个片源目录) |
+| 要让 Jvedio 整理、改名、删除文件 | [媒体写权限](#媒体写权限) |
+| 不想每次手动升级 | [升级](#升级) |
+| 要把 NAS 暴露到公网 | [反向代理](#反向代理与-strm) |
 
 ## 访问控制
 
-按你的使用场景选一种，改 env 后重启容器（`docker compose ... up -d`）生效。
+默认已是「局域网可访问 + 免登录」。按场景调整，改 env 后重启容器生效：
 
-| 场景 | 配置 | 说明 |
-| --- | --- | --- |
-| 局域网共享（**默认**） | 什么都不改 | 绑定全部网卡；Host 白名单由 LAN 模式自动纳入本机网卡地址与主机名，局域网设备可直接打开 |
-| 只允许本机 | `JVEDIO_BIND_ADDRESS=127.0.0.1` | 锁回回环地址，只有本机可访问 |
-| 限定来源 | `JVEDIO_ALLOWED_HOSTS=192.168.1.10,media.lan` | 显式白名单优先于自动纳入（逗号分隔、不含协议、不支持通配符、可带端口） |
-| 关闭自动白名单 | `JVEDIO_LAN_MODE=false` | 此时必须显式填 `JVEDIO_ALLOWED_HOSTS`，否则启动即失败 |
-| 需要口令（NAS、共享网络） | **页面「设置 → 安全」开启口令门** | 12–1024 字符；开启与改密后所有已登录会话立即失效 |
-| 口令（headless 固定） | `JVEDIO_AUTH_MODE=password` + 口令文件 + 叠加 `-f compose.password.yaml` | 环境显式设置优先于页面开关，适合无人值守部署 |
-| 反向代理 | `JVEDIO_PUBLIC_ORIGIN=https://<你的域名>`，`JVEDIO_TRUSTED_PROXIES=<代理IP>`，白名单加上域名；代理转发 `X-Forwarded-*`、SSE 与 Range | 局域网直连是明文 HTTP，跨网段建议代理加 TLS |
+| 场景 | 配置 |
+| --- | --- |
+| 局域网共享（**默认**） | 什么都不改 |
+| 只允许本机 | `JVEDIO_BIND_ADDRESS=127.0.0.1` |
+| 限定来源 | `JVEDIO_ALLOWED_HOSTS=192.168.1.10,media.lan` |
+| 关闭自动白名单 | `JVEDIO_LAN_MODE=false`，此时必须显式填白名单 |
+| 需要口令 | **页面「设置 → 安全」开启口令门**（12–1024 字符） |
+| 口令（无人值守） | `JVEDIO_AUTH_MODE=password` + 口令文件 + 叠加 `-f compose.password.yaml` |
 
-口令模式的启动命令：
+> **⚠️ 口令门开启或改密后，所有已登录会话立即失效**，需要重新进入。
 
-```sh
-docker compose --env-file jvedio.env -f compose.yaml -f compose.password.yaml up -d
-```
-
-`compose.password.yaml` 与仓库同名文件一致：
+口令模式的 headless 配置（`compose.password.yaml`）：
 
 ```yaml
 services:
@@ -233,52 +320,84 @@ services:
       - '${JVEDIO_ADMIN_SECRET:?Set JVEDIO_ADMIN_SECRET}:/run/secrets/admin-password:ro'
 ```
 
-STRM 远程索引默认拒绝未授权 origin：`JVEDIO_STRM_ALLOWED_ORIGINS` 填精确 HTTP(S) origin（不带路径）；访问内网服务还要填 `JVEDIO_STRM_ALLOWED_PRIVATE_ORIGINS`。
+```sh
+docker compose --env-file jvedio.env -f compose.yaml -f compose.password.yaml up -d
+```
+
+环境显式设置优先于页面开关。
+
+## 多个片源目录
+
+有多块盘时，每个片源一条挂载，挂到 `/media` 的子目录下。它们都会出现在建库的目录选择器里。
+
+在 `compose.yaml` 的 `volumes` 下追加：
+
+```yaml
+    volumes:
+      - '${JVEDIO_CONFIG_DIR:?Set JVEDIO_CONFIG_DIR}:/config'
+      - '/volume1/AV:/media/av:ro'
+      - '/volume2/Movies:/media/movies:ro'
+```
+
+> 主片源也可以继续用 env 里的 `JVEDIO_MEDIA_DIR`，其余盘按上面追加。改完 `docker compose ... up -d` 重建容器生效。
+
+## 媒体写权限
+
+片源默认以只读（`ro`）挂载：浏览、播放、收藏都正常。
+
+要让应用**整理、改名、写回或物理删除**文件，改 env：
+
+```sh
+JVEDIO_MEDIA_ACCESS=rw
+```
+
+> **⚠️ 开 `rw` 意味着应用可以改动你的原始文件**。确认要这个能力再开。
+
+## 缓存位置
+
+默认缓存走镜像内匿名卷，删容器自动清理。想把缓存落到宿主盘便于观察，env 加路径并叠加 `compose.cache.yaml`：
+
+```sh
+JVEDIO_CACHE_HOST_DIR=/srv/jvedio/cache
+```
+
+```sh
+docker compose --env-file jvedio.env -f compose.yaml -f compose.cache.yaml up -d
+```
+
+## 反向代理与 STRM
+
+局域网直连是明文 HTTP。跨网段或要对公网提供服务时，建议前面加一层反代做 TLS。
+
+反代除转发普通 HTTP 与 SSE，还要允许大文件上传与 `Range`：
+
+```sh
+JVEDIO_PUBLIC_ORIGIN=https://media.example.com
+JVEDIO_TRUSTED_PROXIES=192.168.1.2
+JVEDIO_ALLOWED_HOSTS=media.example.com
+```
+
+> **⚠️ 不要把服务器 origin 配成 `localhost` 后要求远端浏览器使用**。
+
+STRM 远程索引默认拒绝未授权 origin：
+
+- `JVEDIO_STRM_ALLOWED_ORIGINS` 填精确 HTTP(S) origin（不带路径）；
+- 访问内网 STRM 服务还要填 `JVEDIO_STRM_ALLOWED_PRIVATE_ORIGINS`；
+- 重定向与 HLS 子资源同样受校验，不因初始地址获准就放开全部网络。
 
 ## 升级
 
-> **⚠️ 从 12.0.0 升级到 12.1.x 的行为变更**：默认绑定地址由 `127.0.0.1` 改为 `0.0.0.0`，升级后局域网设备可直接访问。不想要这个暴露就加 `JVEDIO_BIND_ADDRESS=127.0.0.1`。`JVEDIO_CACHE_HOST_DIR` 已不再必填（缓存走镜像内匿名卷）；口令门改为在页面「设置 → 安全」开关，不再依赖 `JVEDIO_AUTH_MODE`。
+> **⚠️ 从 12.0.0 升级到 12.1.x 的行为变更**：默认绑定地址由 `127.0.0.1` 改为 `0.0.0.0`；`JVEDIO_CACHE_HOST_DIR` 不再必填；口令门改为页面开关。
 
-1. 在页面「设置 → 关于 → 容器升级」检查版本、准备升级并下载备份；
-2. 确认备份已保存到容器之外；
-3. 改 env 里的 `JVEDIO_IMAGE` 为目标版本（如 `ghcr.io/spartawhy117/jvedionext:12.0.1`），然后：
+1. 页面「设置 → 关于 → 容器升级」检查版本、准备升级并下载备份；
+2. 确认备份已保存到**容器之外**；
+3. 拉取新镜像并重建容器：
 
 ```sh
 docker compose --env-file jvedio.env -f compose.yaml pull
 docker compose --env-file jvedio.env -f compose.yaml up -d
 ```
 
-维护期间 `/health/ready` 返回 503，状态查询、登录、备份与取消维护仍可用。**数据被新版本初始化后旧镜像会拒绝打开**——不能靠改回旧标签继续用新数据，所以升级前的备份务必保存好。Docker 仓库不会主动推送新版本，每次都要主动 pull。
+> **⚠️ 不可回退**：数据被新版本初始化后，旧镜像会拒绝打开。升级前的备份务必保存好。
 
-## 常用配置参考
-
-| 变量 | 默认 | 说明 |
-| --- | --- | --- |
-| `JVEDIO_IMAGE` | `jvedio:local` | 镜像名与标签；官方镜像填 `ghcr.io/spartawhy117/jvedionext:<版本>` |
-| `JVEDIO_PORT` | `8080` | 宿主机映射端口 |
-| `JVEDIO_BIND_ADDRESS` | `0.0.0.0` | 绑定地址即访问边界；要只允许本机就设 `127.0.0.1` |
-| `JVEDIO_LAN_MODE` | `true` | 白名单留空时自动纳入本机网卡地址；`false` 则必须显式填白名单 |
-| `JVEDIO_ALLOWED_HOSTS` | `localhost,127.0.0.1` | 允许的 Host 头 |
-| `JVEDIO_MEDIA_DIR` | （必填） | 宿主机片源目录，挂到容器 `/media`；库的路径在页面建库时选择并写入后端，不在此配置 |
-| `JVEDIO_CACHE_HOST_DIR` | 空（匿名卷） | 想把缓存落到宿主盘时才填，同时叠加 `-f compose.cache.yaml` |
-| `JVEDIO_MEDIA_ACCESS` | `ro` | `ro` 只读；整理/删除需改 `rw` |
-| `JVEDIO_METATUBE_SERVER_URL` | 空 | **抓取必填**，不填任务会直接失败 |
-| `JVEDIO_STRM_ALLOWED_ORIGINS` | `[]` | STRM 允许的远端 origin |
-| `JVEDIO_STRM_ALLOWED_PRIVATE_ORIGINS` | `[]` | 允许的内网 STRM origin |
-| `JVEDIO_UID` / `JVEDIO_GID` | `1000` | 与宿主目录属主保持一致 |
-
-## 排障
-
-| 现象 | 原因 | 处理 |
-| --- | --- | --- |
-| 页面「数据加载失败」 | 本机代理劫持了 127.0.0.1 | 让代理放行本地回环 |
-| 403 / Host 不匹配 | `JVEDIO_ALLOWED_HOSTS` 缺当前域名或 IP | 补上后重启容器 |
-| 启动即失败 | `config` 不可写，或目录属主与 UID 不一致 | 修正属主，别用 root 跑 |
-| 启动报 `No local host address resolved` | 容器内枚举不到本机网卡地址 | 显式填 `JVEDIO_ALLOWED_HOSTS` |
-| 抓取全部失败 | 没配 MetaTube 地址 | 填设置或 `JVEDIO_METATUBE_SERVER_URL` |
-| 有库无海报、不能播放 | `/media` 里没有对应片源 | 挂载片源，路径要与库记录一致 |
-| 两个实例抢同一目录 | `config` 被重复挂载 | 一个数据目录只跑一个容器 |
-
-日志在 `config/log/runtime/`。排障时保留 `config`、日志与原镜像，不要覆盖现有数据库，也不要用全局 `docker prune`。
-
-进阶内容（反向代理细节、灾备恢复、恢复脚本）见 [Docker 服务器部署与恢复](docker-server-deployment.md)。
+> **ℹ️ 镜像可用性不会自动核实**：页面只校验版本号。**桌面 Release 发布 ≠ Docker 镜像已推送**——升级前先确认能 `docker pull` 到目标 tag。
