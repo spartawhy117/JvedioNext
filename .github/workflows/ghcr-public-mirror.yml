@@ -1,0 +1,63 @@
+name: GHCR Public Mirror
+
+# 公开仓侧的镜像归属：GitHub 仓库侧栏只列「由该仓库发布」的包。
+# 镜像本体由私有仓构建推送，这里只做一次同注册表复推，使包在公开仓 Packages 下可见。
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '镜像标签（如 12.1.1）'
+        required: true
+        type: string
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: ghcr-public-mirror-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/spartawhy117/jvedionext
+
+jobs:
+  mirror:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Resolve tag
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          raw="${INPUT_TAG:-$RELEASE_TAG}"
+          tag="${raw#v}"
+          if ! printf '%s' "$tag" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Unsupported tag '$raw'"
+            exit 1
+          fi
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Mirror version tag
+        run: |
+          set -euo pipefail
+          docker pull "$IMAGE:$TAG"
+          docker tag "$IMAGE:$TAG" "$IMAGE:$TAG"
+          docker push "$IMAGE:$TAG"
+
+      - name: Mirror latest tag
+        run: |
+          set -euo pipefail
+          docker pull "$IMAGE:$TAG"
+          docker tag "$IMAGE:$TAG" "$IMAGE:latest"
+          docker push "$IMAGE:latest"
