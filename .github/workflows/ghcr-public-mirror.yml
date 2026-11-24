@@ -1,7 +1,13 @@
 name: GHCR Public Mirror
 
-# 公开仓侧的镜像归属：GitHub 仓库侧栏只列「由该仓库发布」的包。
-# 镜像本体由私有仓构建推送，这里派生出新 digest 再推，使其登记为公开仓的发布。
+# 手动兜底：把已发布的镜像从公开仓再推一次。
+#
+# 注意：这不是包归属的主路径。包的仓库链接是 package 对象上的独立属性，
+# 已建包的链接不会因为「另一个仓又推了一次」而改变——改 OCI source 标签、
+# 复推同 digest、派生新 digest 三种做法都已实测无效（见
+# doc/operations/dual-repo-docker-image-release.md §8）。
+# 真正的迁移路径是包设置页 Unlink → Connect repository，一次性人工操作。
+# 本工作流仅保留手动触发，用于镜像内容需要从公开仓侧重新落一次时救急。
 on:
   workflow_dispatch:
     inputs:
@@ -9,15 +15,13 @@ on:
         description: '镜像标签（如 12.1.1）'
         required: true
         type: string
-  release:
-    types: [published]
 
 permissions:
   contents: read
   packages: write
 
 concurrency:
-  group: ghcr-public-mirror-${{ github.event.release.tag_name || inputs.tag }}
+  group: ghcr-public-mirror-${{ inputs.tag }}
   cancel-in-progress: false
 
 env:
@@ -29,11 +33,10 @@ jobs:
     steps:
       - name: Resolve tag
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
           INPUT_TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
-          raw="${INPUT_TAG:-$RELEASE_TAG}"
+          raw="$INPUT_TAG"
           tag="${raw#v}"
           if ! printf '%s' "$tag" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "::error::Unsupported tag '$raw'"
