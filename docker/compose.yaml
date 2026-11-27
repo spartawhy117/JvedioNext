@@ -1,0 +1,25 @@
+# Jvedio Docker 主模板：零必填、零环境变量文件，照抄即可启动。
+# 进阶配置（反代 / STRM / MetaTube / 口令门）见部署文档：直接在本文件加 environment 字面值。
+services:
+  jvedio:
+    image: ghcr.io/spartawhy117/jvedionext:latest  # 锁定版本时改成 :x.y.z
+    init: true
+    read_only: true
+    stop_grace_period: 45s
+    # restart: unless-stopped      # 长期托管可打开（默认不带，避免干扰测试收尾与恢复用例）
+    # user: '1000:1000'            # 绑定宿主目录且属主与镜像默认 1000:1000 不同时修改
+    ports:
+      - '8080:8080'                # 左侧是宿主端口；只允许本机访问时改成 '127.0.0.1:8080:8080'
+    volumes:
+      - jvedionext-data:/config    # 运行数据；落到宿主目录就把左侧改成 ./ 或 / 开头的路径（属主需为运行用户）
+      - ./media:/media:rw          # 改成你的片源目录；只想浏览、不许程序改动原片时改成 :ro
+      # - /volume2/AV:/media/av:rw # 多片源：按需复制，挂成 /media 子目录（每盘可分别设置 rw / ro）
+      # - /srv/jvedio/cache:/cache # 可选：播放 / 转码缓存落宿主盘（默认匿名卷，属主需为运行用户）
+    # devices:                     # 可选：硬件解码透传（仅转码档生效，无设备自动回退软解）
+    #   - /dev/dri:/dev/dri
+    tmpfs:
+      - /tmp:size=1g,mode=1777
+
+volumes:
+  # compose 短语法引用的命名卷必须在此声明；被 bind 路径覆盖时不会创建、无残留。
+  jvedionext-data:
